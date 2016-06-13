@@ -22,6 +22,10 @@
 //
 // Traversal functions for terminals are straighforward....
 //
+void TIntermState::traverse(TIntermTraverser* it)
+{
+}
+
 void TIntermSymbol::traverse(TIntermTraverser* it)
 {
    if (it->visitSymbol)

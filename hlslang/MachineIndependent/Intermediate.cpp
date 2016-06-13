@@ -22,6 +22,12 @@ static TPrecision GetHigherPrecision (TPrecision left, TPrecision right) {
 // These functions are not member functions of the nodes.
 // They are called from parser productions.
 
+TIntermState* ir_add_state(const TString &k, const TString &v, TSourceLoc ln)
+{
+	TIntermState *node = new TIntermState(k, v);
+	node->setLine(ln);
+	return node;
+}
 
 // Add a terminal node for an identifier in an expression.
 TIntermSymbol* ir_add_symbol(const TVariable* var, TSourceLoc line)
@@ -441,7 +447,6 @@ TIntermTyped* ir_add_conversion(TOperator op, const TType& type, TIntermTyped* n
    //
    switch (node->getBasicType())
    {
-   case EbtVoid:
    case EbtSampler1D:
    case EbtSampler2D:
    case EbtSampler3D:
@@ -451,6 +456,8 @@ TIntermTyped* ir_add_conversion(TOperator op, const TType& type, TIntermTyped* n
    case EbtSampler2DArray:
    case EbtSamplerRect:        // ARB_texture_rectangle
    case EbtSamplerRectShadow:  // ARB_texture_rectangle
+       return node;
+   case EbtVoid:
       return 0;
    default: break;
    }

@@ -1031,10 +1031,21 @@ void HlslLinker::buildUniformReflection(const std::vector<GlslSymbol*>& constant
 		}
 		else
 			info.registerSpec = 0;
-		
+
+		int numStates = 0;
+		const ShState *states = nullptr;
+		if (s->getStates())
+		{
+			const TVector<ShState> &_s = *s->getStates();
+			numStates = (int )_s.size();
+			states = &_s[0];
+		}
+
 		info.type = (EShType)s->getType();
 		info.arraySize = s->getArraySize();
 		info.init = 0;
+		info.numStates = numStates;
+		info.states = states;
 		uniforms.push_back(info);
 	}
 }
@@ -1234,7 +1245,7 @@ void HlslLinker::emitOutputNonStructParam(GlslSymbol* sym, EShLanguage lang, boo
 		infoSink.info << getTypeString(sym->getType()) << ")\n";
 		return;
 	}
-	
+
 	// For "inout" parameters, the preamble was already written so no need to do it here.
 	if (sym->getQualifier() != EqtInOut)
 	{

@@ -139,6 +139,12 @@ enum EAttribSemantic
 };
 
 
+typedef struct
+{
+	const char *name;
+	const char *value;
+} ShState;
+
 /// Uniform info struct
 typedef struct
 {
@@ -148,6 +154,8 @@ typedef struct
 	EShType type;
 	int arraySize;
 	float *init;
+	int numStates;
+	const ShState *states;
 } ShUniformInfo;
 
 

@@ -249,6 +249,7 @@ enum TOperator
 	EOpVecTernarySel,
 };
 
+class TIntermState;
 class TIntermTraverser;
 class TIntermAggregate;
 class TIntermBinary;
@@ -285,10 +286,31 @@ public:
 	virtual TIntermSelection* getAsSelectionNode() { return 0; }
 	virtual TIntermSymbol*    getAsSymbolNode() { return 0; }
 	virtual TIntermDeclaration* getAsDeclaration() { return 0; }
+	virtual TIntermState*     getAsStateNode() { return 0; };
 	virtual ~TIntermNode() { }
 
 protected:
 	TSourceLoc line;
+};
+
+class TIntermState : public TIntermNode
+{
+public:
+	TIntermState(const TString &name, const TString &value)
+ 		: mName(name)
+		, mValue(value)
+	{
+	}
+
+	const TString &getStateName() const { return mName; }
+	const TString &getStateValue() const { return mValue; }
+
+	virtual void traverse(TIntermTraverser*);
+	virtual TIntermState *getAsStateNode() { return this; };
+
+protected:
+	TString mName;
+	TString mValue;
 };
 
 // This is just to help yacc.

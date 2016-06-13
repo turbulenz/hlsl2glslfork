@@ -419,12 +419,24 @@ private:
 };
 
 
+struct TStringPair
+{
+	TString k;
+	TString v;
+};
+
+
+typedef TVector<TStringPair> TStates;
+
 
 class TTypeInfo
 {
 public:
 	POOL_ALLOCATOR_NEW_DELETE(GlobalPoolAllocator)
 	TTypeInfo( const TString &s, TAnnotation *ann) : semantic(s), annotation(ann)
+	{
+	}
+	TTypeInfo( TStates *s) : states(s)
 	{
 	}
 	TTypeInfo( const TString &s, const TString &r, TAnnotation *ann) : semantic(s), registerSpec(r), annotation(ann)
@@ -435,6 +447,7 @@ public:
 	const TString& getSemantic() const { return semantic; }
 	const TString& getRegister() const { return registerSpec; }
 	const TAnnotation* getAnnotation() const { return annotation; }
+	const TStates* getStates() const { return states; }
 
 private:
 	// forbid copying
@@ -444,6 +457,7 @@ private:
 	TString semantic;
 	TString registerSpec;
 	TAnnotation *annotation;
+	TStates *states;
 };
 
 #endif // _TYPES_INCLUDED_

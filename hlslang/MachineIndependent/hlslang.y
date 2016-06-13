@@ -128,6 +128,7 @@ extern void yyerror(TParseContext&, const char*);
 %type <interm> assignment_operator unary_operator
 %type <interm.intermTypedNode> variable_identifier primary_expression postfix_expression
 %type <interm.intermTypedNode> expression int_expression assign_expression
+%type <interm.intermNode>      sampler_init_item
 %type <interm.intermTypedNode> unary_expression mul_expression add_expression
 %type <interm.intermTypedNode> rel_expression eq_expression 
 %type <interm.intermTypedNode> cond_expression const_expression
@@ -137,6 +138,7 @@ extern void yyerror(TParseContext&, const char*);
 
 %type <interm.intermTypedNode> initialization_list sampler_initializer
 %type <interm.intermAggregate> initializer_list
+%type <interm.intermAggregate> sampler_init_list
 
 %type <interm.intermNode> translation_unit function_definition
 %type <interm.intermNode> statement simple_statement
@@ -1497,36 +1499,18 @@ single_declaration
 		if (parseContext.structQualifierErrorCheck($2.line, $1))
 			parseContext.recover();
 		
-		if (!IsSampler($1.type)) {
-			TIntermSymbol* symbol;
-			if (!parseContext.executeInitializer($2.line, *$2.string, $3, $1, $5, symbol)) {
-				if (symbol)
-					$$ = ir_add_declaration(symbol, $5, $4.line, parseContext);
-				else
-					$$ = 0;
-			} else {
-				parseContext.recover();
+		TIntermSymbol* symbol;
+		if (!parseContext.executeInitializer($2.line, *$2.string, $3, $1, $5, symbol)) {
+			if (symbol)
+				$$ = ir_add_declaration(symbol, $5, $4.line, parseContext);
+			else
 				$$ = 0;
-			}
 		} else {
-			if (parseContext.structQualifierErrorCheck($2.line, $1))
-				parseContext.recover();
-
-			if (parseContext.nonInitConstErrorCheck($2.line, *$2.string, $1))
-				parseContext.recover();
-
-			if (parseContext.nonInitErrorCheck($2.line, *$2.string, $3, $1))
-				parseContext.recover();
-				
-			TSymbol* symbol = parseContext.symbolTable.find(*$2.string);
-			if (symbol) {
-				$$ = ir_add_declaration(symbol, NULL, $2.line, parseContext);
-			} else {
-				$$ = 0;
-			}
+			parseContext.recover();
+			$$ = 0;
 		}
-    }
-    ;
+	}
+	;
 
 // Grammar Note:  No 'enum', or 'typedef'.
 
@@ -2472,21 +2456,32 @@ type_info
 
 sampler_initializer
 	: SAMPLERSTATE LEFT_BRACE sampler_init_list RIGHT_BRACE {
-		TIntermConstant* constant = ir_add_constant(TType(EbtFloat, EbpUndefined, EvqConst, 1), $1.line);
-		constant->setValue(0.f);
-		$$ = constant;
+		$$ = $3;
 	}
 	| SAMPLERSTATE LEFT_BRACE RIGHT_BRACE {
+		TIntermAggregate *agg = new TIntermAggregate();
+		$$ = agg;
 	}
 	;
 
 sampler_init_list
-	: sampler_init_item { }
-	| sampler_init_list sampler_init_item { }
+	: sampler_init_item {
+		$$ = ir_make_aggregate( $1, $1->getLine() );
+	}
+	| sampler_init_list sampler_init_item {
+		$$ = ir_grow_aggregate( $1, $2, $1->getLine() );
+	}
 	;
 
 sampler_init_item
-	: IDENTIFIER EQUAL IDENTIFIER SEMICOLON {}
+	: IDENTIFIER EQUAL IDENTIFIER SEMICOLON {
+		$$ = ir_add_state(*$1.string, *$3.string, $1.line);
+	}
+	| IDENTIFIER EQUAL ann_numerical_constant SEMICOLON {
+		char b[16];
+		sprintf(b, "%f", $3.f);
+		$$ = ir_add_state(*$1.string, b, $1.line);
+	}
 	| IDENTIFIER EQUAL LEFT_ANGLE IDENTIFIER RIGHT_ANGLE SEMICOLON {}
 	| IDENTIFIER EQUAL LEFT_PAREN IDENTIFIER RIGHT_PAREN SEMICOLON {}
 	| TEXTURE EQUAL IDENTIFIER SEMICOLON {}
