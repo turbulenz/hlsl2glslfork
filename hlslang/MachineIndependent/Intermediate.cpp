@@ -22,6 +22,12 @@ static TPrecision GetHigherPrecision (TPrecision left, TPrecision right) {
 // These functions are not member functions of the nodes.
 // They are called from parser productions.
 
+TIntermState* ir_add_state(const TString &k, const TString &v, TSourceLoc ln)
+{
+	TIntermState *node = new TIntermState(k, v);
+	node->setLine(ln);
+	return node;
+}
 
 // Add a terminal node for an identifier in an expression.
 TIntermSymbol* ir_add_symbol(const TVariable* var, TSourceLoc line)
@@ -433,27 +439,21 @@ TIntermAggregate* ir_set_aggregate_op(TIntermNode* node, TOperator op, TSourceLo
 // node passed in if no conversion was needed. Returns NULL if conversion can't be done.
 TIntermTyped* ir_add_conversion(TOperator op, const TType& type, TIntermTyped* node, TInfoSink& infoSink)
 {
-    if (!node)
-        return 0;
+	if (!node)
+		return 0;
 
-   //
-   // Does the base type allow operation?
-   //
-   switch (node->getBasicType())
-   {
-   case EbtVoid:
-   case EbtSampler1D:
-   case EbtSampler2D:
-   case EbtSampler3D:
-   case EbtSamplerCube:
-   case EbtSampler1DShadow:
-   case EbtSampler2DShadow:
-   case EbtSampler2DArray:
-   case EbtSamplerRect:        // ARB_texture_rectangle
-   case EbtSamplerRectShadow:  // ARB_texture_rectangle
-      return 0;
-   default: break;
-   }
+	if (IsSampler(node->getBasicType()) &&
+	    IsSampler(type.getBasicType())) {
+		return node;
+	}
+
+	//
+	// Does the base type allow operation?
+	//
+
+	if (EbtVoid == node->getBasicType()) {
+		return 0;
+	}
 
    //
    // Otherwise, if types are identical, no problem
@@ -1149,6 +1149,14 @@ bool TIntermBinary::promote(TParseContext& ctx)
 {
    TBasicType type = left->getBasicType();
 
+   //
+   // Samplers are not well-typed
+   //
+   if (IsSampler(left->getBasicType()) && IsSampler(right->getBasicType()))
+   {
+       return true;
+   }
+    
    //
    // Arrays have to be exact matches.
    //

@@ -1217,12 +1217,34 @@ bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, TPu
    return executeInitializer( line, identifier, 0, pType, initializer, intermNode, variable);
 }
 
+static TStates *parseSamplerStates(TIntermAggregate *agg)
+{
+    TStates *states = new TStates();
+    TNodeArray &nodes = agg->getNodes();
+    for (TIntermNode *node : nodes)
+    {
+        TIntermState *state = node->getAsStateNode();
+        if (state)
+        {
+            TStringPair _s = {state->getStateName(), state->getStateValue()};
+            states->push_back(_s);
+        }
+    }
+    return states;
+};
+
+
 //
 // Initializers show up in several places in the grammar.  Have one set of
 // code to handle them here.
 //
-bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, const TTypeInfo *info, TPublicType& pType, 
-                                       TIntermTyped*& initializer, TIntermSymbol*& intermNode, TVariable* variable)
+bool TParseContext::executeInitializer(TSourceLoc line,
+                                       TString& identifier,
+                                       const TTypeInfo *info,
+                                       TPublicType& pType,
+                                       TIntermTyped*& initializer,
+                                       TIntermSymbol*& intermNode,
+                                       TVariable* variable)
 {
 	AdjustTypeQualifier (pType);
 
@@ -1238,6 +1260,19 @@ bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, con
 		//
 		// add variable to symbol table
 		//
+
+		// If this is a sampler, fill out the typeinfo with state info
+
+		if (nullptr == info && IsSampler(type.getBasicType()))
+		{
+			TIntermAggregate *agg = initializer->getAsAggregate();
+			if (agg)
+			{
+				TStates *states = parseSamplerStates(agg);
+				info = new TTypeInfo(states);
+			}
+		}
+
 		variable = new TVariable(&identifier, info, type);
 		if (! symbolTable.insert(*variable))
 		{
@@ -1249,7 +1284,7 @@ bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, con
 	} 
 	//check to see if we have a blind aggregate
 	TIntermAggregate *agg = initializer->getAsAggregate();
-	if (agg && agg->getOp() == EOpNull)
+	if (agg && agg->getOp() == EOpNull && !IsSampler(type.getBasicType()))
 	{	
 		if (type.isArray() && type.getArraySize() == 0)
 			variable->getType().setArraySize(agg->getNodes().size());

@@ -21,6 +21,7 @@ struct TVectorFields
 //
 class TInfoSink;
 
+TIntermState* ir_add_state(const TString &, const TString &, TSourceLoc line);
 TIntermSymbol* ir_add_symbol(const TVariable* var, TSourceLoc);
 TIntermSymbol* ir_add_symbol_internal(int id, const TString& name, const TTypeInfo *info, const TType& type, TSourceLoc line);
 TIntermConstant* ir_add_constant(const TType&, TSourceLoc);

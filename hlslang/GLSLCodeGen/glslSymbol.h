@@ -12,7 +12,15 @@
 class GlslSymbol : public GlslSymbolOrStructMemberBase
 {
 public:
-	GlslSymbol( const std::string &n, const std::string &s, const std::string &r, int id, EGlslSymbolType t, TPrecision precision, EGlslQualifier q, int as = 0 );
+	GlslSymbol( const std::string &n,
+                const std::string &s,
+                const std::string &r,
+                int id,
+                EGlslSymbolType t,
+                TPrecision precision,
+                EGlslQualifier q,
+                TVector<ShState> *states,
+                int as = 0);
 
 	bool getIsParameter() const { return isParameter; }
 	void setIsParameter( bool param ) { isParameter = param; }
@@ -52,6 +60,8 @@ public:
 	void releaseRef() { assert (refCount >= 0 ); if ( refCount > 0 ) refCount--; }
 	int getRef() const { return refCount; }
 
+	const TVector<ShState> *getStates() const { return states; }
+
 private:
 	std::string mangledName;
 	std::string mutableMangledName;
@@ -62,7 +72,7 @@ private:
 	bool isParameter;
 	int refCount;
 	bool isGlobal;
+	TVector<ShState> *states;
 };
 
 #endif //GLSL_SYMBOL_H
-

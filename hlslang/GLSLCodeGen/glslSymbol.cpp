@@ -375,14 +375,23 @@ static bool IsGlslBuiltin (const std::string& name)
 	return false;
 }
 
-GlslSymbol::GlslSymbol( const std::string &n, const std::string &s, const std::string &r, int id, EGlslSymbolType t, TPrecision prec, EGlslQualifier q, int as )
+GlslSymbol::GlslSymbol( const std::string &n,
+                        const std::string &s,
+                        const std::string &r,
+                        int id,
+                        EGlslSymbolType t,
+                        TPrecision prec,
+                        EGlslQualifier q,
+                        TVector<ShState> *states,
+                        int as)
  : GlslSymbolOrStructMemberBase(n, s, t, q, prec, as),
    registerSpec(r),
    identifier(id),
    mangleCounter(0),
    structPtr(0),
    isParameter(false),
-   refCount(0)
+   refCount(0),
+   states(states)
 {
 	if (IsReservedGlslKeyword(n) || IsGlslBuiltin(n))
 	{
