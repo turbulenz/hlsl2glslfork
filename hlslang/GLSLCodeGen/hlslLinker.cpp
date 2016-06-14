@@ -315,7 +315,7 @@ HlslLinker::~HlslLinker()
 		delete [] it->name;
 		delete [] it->semantic;
 		delete [] it->registerSpec;
-		delete [] it->init;
+		// delete [] it->init;
 	}
 }
 
@@ -1032,6 +1032,14 @@ void HlslLinker::buildUniformReflection(const std::vector<GlslSymbol*>& constant
 		else
 			info.registerSpec = 0;
 
+		int initSize = 0;
+		float *init = nullptr;
+		if (0 != s->getInitData().size())
+		{
+			init = &(s->getInitData())[0];
+			initSize = (int)(s->getInitData()).size();
+		}
+
 		int numStates = 0;
 		const ShState *states = nullptr;
 		if (s->getStates())
@@ -1043,7 +1051,8 @@ void HlslLinker::buildUniformReflection(const std::vector<GlslSymbol*>& constant
 
 		info.type = (EShType)s->getType();
 		info.arraySize = s->getArraySize();
-		info.init = 0;
+		info.initSize = initSize;
+		info.init = init;
 		info.numStates = numStates;
 		info.states = states;
 		uniforms.push_back(info);

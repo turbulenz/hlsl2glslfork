@@ -475,7 +475,33 @@ void TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* 
 	}
 }
 
+/// Recurse though a structure of nodes and store each float value in initData
+static void convertInitData(TVector<float> &initData, TIntermTyped *initDataNode)
+{
+	TIntermAggregate *agg = initDataNode->getAsAggregate();
+	if (agg)
+	{
+		TNodeArray &nodes = agg->getNodes();
+		for (TIntermNode *n : nodes)
+		{
+			TIntermTyped *t = n->getAsTyped();
+			if (t)
+			{
+				convertInitData(initData, t);
+			}
+		}
+		return;
+	}
 
+	TIntermConstant *c = initDataNode->getAsConstant();
+	if (c)
+	{
+		initData.push_back(c->toFloat());
+		return;
+	}
+
+	fprintf(stderr, "warning: unrecognized initialization data\n");
+}
 
 bool TGlslOutputTraverser::traverseDeclaration(bool preVisit, TIntermDeclaration* decl, TIntermTraverser* it)
 {
@@ -552,6 +578,21 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit, TIntermDeclaration
 	if (type.isArray())
 		out << "[" << type.getArraySize() << "]";
 	
+	if (!IsSampler(type.getBasicType()) &&
+	    decl->hasInitialization() &&
+	    type.getQualifier() != EvqConst)
+	{
+		TIntermBinary* initNode = decl->getDeclaration()->getAsBinaryNode();
+		TIntermSymbol* symbol = initNode->getLeft()->getAsSymbolNode();
+		if (symbol && symbol->isGlobal() && goit->global->hasSymbol(symbol->getId()))
+		{
+			GlslSymbol &sym = goit->global->getSymbol(symbol->getId());
+			TVector<float> &initData = sym.getInitData();
+			TIntermTyped *initDataNode = initNode->getRight();
+			convertInitData(initData, initDataNode);
+		}
+	}
+    
 	current->endStatement();
 	return false;
 }

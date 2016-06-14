@@ -153,6 +153,7 @@ typedef struct
 	char *registerSpec;
 	EShType type;
 	int arraySize;
+	int initSize;
 	float *init;
 	int numStates;
 	const ShState *states;
