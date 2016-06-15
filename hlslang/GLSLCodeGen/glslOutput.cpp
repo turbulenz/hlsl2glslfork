@@ -496,7 +496,11 @@ static void convertInitData(TVector<float> &initData, TIntermTyped *initDataNode
 	TIntermConstant *c = initDataNode->getAsConstant();
 	if (c)
 	{
-		initData.push_back(c->toFloat());
+		const unsigned count = c->getCount();
+		for (unsigned i = 0 ; i < count ; ++i)
+		{
+			initData.push_back(c->toFloat(i));
+		}
 		return;
 	}
 
