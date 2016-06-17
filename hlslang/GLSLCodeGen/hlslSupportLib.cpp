@@ -761,10 +761,16 @@ void initializeHLSLSupportLibrary(ETargetVersion targetVersion)
 		"vec3 xll_matrixindex_mf3x3_i (mat3 m, int i) { vec3 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; return v; }\n"
 		"vec4 xll_matrixindex_mf4x4_i (mat4 m, int i) { vec4 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; v.w=m[3][i]; return v; }\n"
 
-        "vec3 xll_matrixindex_mf3x4_i (mat3x4 m, int i) { vec3 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; return v; }\n"
+		// Non-square
+
+		"vec2 xll_matrixindex_mf2x3_i (mat2x3 m, int i) { vec2 v; v.x=m[0][i]; v.y=m[1][i]; return v; }\n"
+		"vec2 xll_matrixindex_mf2x4_i (mat2x4 m, int i) { vec2 v; v.x=m[0][i]; v.y=m[1][i]; return v; }\n"
+		"vec3 xll_matrixindex_mf3x2_i (mat3x2 m, int i) { vec3 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; return v; }\n"
+		"vec3 xll_matrixindex_mf3x4_i (mat3x4 m, int i) { vec3 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; return v; }\n"
+		"vec4 xll_matrixindex_mf4x2_i (mat4x2 m, int i) { vec4 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; v.w=m[3][i]; return v; }\n"
 		"vec4 xll_matrixindex_mf4x3_i (mat4x3 m, int i) { vec4 v; v.x=m[0][i]; v.y=m[1][i]; v.z=m[2][i]; v.w=m[3][i]; return v; }\n"
-        )
-	);
+		)
+		);
 
 	// The GLSL ES implementation on NaCl does not support dynamic indexing
 	// (except when the operand is a uniform in vertex shaders). The GLSL specification
@@ -788,6 +794,14 @@ void initializeHLSLSupportLibrary(ETargetVersion targetVersion)
 		"vec2 xll_matrixindexdynamic_mf2x2_i (mat2 m, int i) { return xll_matrixindex_mf2x2_i (m, i); }\n"
 		"vec3 xll_matrixindexdynamic_mf3x3_i (mat3 m, int i) { return xll_matrixindex_mf3x3_i (m, i); }\n"
 		"vec4 xll_matrixindexdynamic_mf4x4_i (mat4 m, int i) { return xll_matrixindex_mf4x4_i (m, i); }\n"
+
+		"vec2 xll_matrixindexdynamic_mf2x3_i (mat2x3 m, int i) { return xll_matrixindex_mf2x3_i(m, i); }\n"
+		"vec2 xll_matrixindexdynamic_mf2x4_i (mat2x4 m, int i) { return xll_matrixindex_mf2x4_i(m, i); }\n"
+		"vec3 xll_matrixindexdynamic_mf3x2_i (mat3x2 m, int i) { return xll_matrixindex_mf3x2_i(m, i); }\n"
+		"vec3 xll_matrixindexdynamic_mf3x4_i (mat3x4 m, int i) { return xll_matrixindex_mf3x4_i(m, i); }\n"
+		"vec4 xll_matrixindexdynamic_mf4x2_i (mat4x2 m, int i) { return xll_matrixindex_mf4x2_i(m, i); }\n"
+		"vec4 xll_matrixindexdynamic_mf4x3_i (mat4x3 m, int i) { return xll_matrixindex_mf4x3_i(m, i); }\n"
+
 		"#endif\n")
 		);
 
