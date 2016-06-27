@@ -1568,6 +1568,19 @@ TIntermTyped* TParseContext::constructBuiltInAllowUpwardVectorPromote(
     const TType* type, TOperator op, TIntermNode* node, TSourceLoc line, bool subset)
 {
     TIntermTyped* tNode = node->getAsTyped();
+
+    // Only allow scalar -> vector promotion
+    
+    if ( !tNode->isVector() )
+    {
+        tNode = constructBuiltIn(type, op, tNode, line, subset);
+    }
+    else
+    {
+        tNode = nullptr;
+    }
+    
+#if 0
     // Handle upward promotion of vectors:
     //   HLSL allows upward promotion of vectors as a special case to function calls.  For example,
     //   the call mul( mf4, vf3 ) will end up upward promoting the second argument from a float3
@@ -1600,6 +1613,7 @@ TIntermTyped* TParseContext::constructBuiltInAllowUpwardVectorPromote(
     {
         tNode = constructBuiltIn(type, op, tNode, line, subset);
     }
+#endif
 
     return tNode;
 }
