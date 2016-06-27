@@ -682,6 +682,12 @@ bool TParseContext::constructorErrorCheck(const TSourceLoc& line, TIntermNode* n
       return true;
    }
 
+   if (!full)
+   {
+	   error(line, "not enough arguments", "constructor", "");
+	   return true;
+   }
+
    if (overFull)
    {
       error(line, "too many arguments", "constructor", "");
