@@ -31,7 +31,7 @@ private:
 	static bool traverseDeclaration(bool preVisit, TIntermDeclaration*, TIntermTraverser*);
 
 	void outputLineDirective (const TSourceLoc& line);
-	void traverseArrayDeclarationWithInit(TIntermDeclaration* decl);
+	void traverseArrayDeclarationWithInit(TIntermDeclaration*);
 
 public:
 	TGlslOutputTraverser (TInfoSink& i, std::vector<GlslFunction*> &funcList, std::vector<GlslStruct*> &sList, std::stringstream& deferredArrayInit, std::stringstream& deferredMatrixInit, ETargetVersion version, unsigned options);

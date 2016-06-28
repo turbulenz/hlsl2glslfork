@@ -1032,7 +1032,7 @@ parameter_declarator
             parseContext.error($2.line, "illegal use of type 'void'", $2.string->c_str(), "");
             parseContext.recover();
         }
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
         TParameter param = {$2.string, 0, new TType($1)};
         $$.line = $2.line;
@@ -1043,7 +1043,7 @@ parameter_declarator
             parseContext.error($2.line, "illegal use of type 'void'", $2.string->c_str(), "");
             parseContext.recover();
         }
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
         TParameter param = {$2.string, 0, new TType($1)};
         $$.line = $2.line;
@@ -1057,7 +1057,7 @@ parameter_declarator
             parseContext.error($2.line, "illegal use of type 'void'", $2.string->c_str(), "");
             parseContext.recover();
         }
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
         TParameter param = {$2.string, new TTypeInfo("", *$3.string, 0), new TType($1)};
         $$.line = $2.line;
@@ -1069,7 +1069,7 @@ parameter_declarator
             parseContext.error($2.line, "illegal use of type 'void'", $2.string->c_str(), "");
             parseContext.recover();
         }
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
         TParameter param = {$2.string, new TTypeInfo(*$4.string, 0), new TType($1)};
         $$.line = $2.line;
@@ -1080,7 +1080,7 @@ parameter_declarator
         if (parseContext.arrayTypeErrorCheck($3.line, $1))
             parseContext.recover();
 
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
 
         int size;
@@ -1098,7 +1098,7 @@ parameter_declarator
         if (parseContext.arrayTypeErrorCheck($3.line, $1))
             parseContext.recover();
 
-        if (parseContext.reservedErrorCheck($2.line, *$2.string))
+        if (parseContext.reservedErrorCheck($2.line, *$2.string, true))
             parseContext.recover();
 
         int size;
@@ -1206,8 +1206,9 @@ init_declarator_list
         $$ = $1;
     }
     | init_declarator_list COMMA IDENTIFIER type_info {
-		TPublicType type = ir_get_decl_type_noarray($1);
-		
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
+	    TPublicType type = ir_get_decl_type_noarray($1);
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
         
@@ -1224,6 +1225,9 @@ init_declarator_list
 			$$ = ir_grow_declaration($1, sym, NULL, parseContext);
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info {
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
+
 		TPublicType type = ir_get_decl_type_noarray($1);
 		
         if (parseContext.structQualifierErrorCheck($3.line, type))
@@ -1248,6 +1252,8 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info {
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
 		
         if (parseContext.structQualifierErrorCheck($3.line, type))
@@ -1276,6 +1282,8 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
 		
         if (parseContext.structQualifierErrorCheck($3.line, type))
@@ -1303,6 +1311,8 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
 		int array_size;
 		
@@ -1336,6 +1346,8 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
 		
         if (parseContext.structQualifierErrorCheck($3.line, type))
@@ -1373,6 +1385,8 @@ single_declaration
 		$$ = 0;
     }    
     | fully_specified_type IDENTIFIER type_info {				
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
 		bool error = false;
         if (error &= parseContext.structQualifierErrorCheck($2.line, $1))
             parseContext.recover();
@@ -1391,6 +1405,9 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
+
         if (parseContext.structQualifierErrorCheck($2.line, $1))
             parseContext.recover();
 
@@ -1414,6 +1431,9 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
+
         if (parseContext.structQualifierErrorCheck($2.line, $1))
             parseContext.recover();
 
@@ -1440,6 +1460,8 @@ single_declaration
         }
 	}
     | fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
 		if (parseContext.structQualifierErrorCheck($2.line, $1))
 			parseContext.recover();
 
@@ -1466,6 +1488,9 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
+
         if (parseContext.structQualifierErrorCheck($2.line, $1))
             parseContext.recover();
 
@@ -1496,6 +1521,9 @@ single_declaration
 		}       
     }
     | fully_specified_type IDENTIFIER type_info EQUAL initializer {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+		    parseContext.recover();
+
 		if (parseContext.structQualifierErrorCheck($2.line, $1))
 			parseContext.recover();
 		

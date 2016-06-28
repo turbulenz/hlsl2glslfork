@@ -32,7 +32,9 @@ struct TParseContext
 	
 	void C_DECL error(TSourceLoc, const char *szReason, const char *szToken, 
 					 const char *szExtraInfoFormat, ...);
-	bool reservedErrorCheck(const TSourceLoc& line, const TString& identifier);
+	bool reservedErrorCheck(const TSourceLoc& line,
+				const TString& identifier,
+				const bool decl=false);
 	void recover();
 
 	TQualifier getDefaultQualifier() const { return symbolTable.atGlobalLevel() ? EvqGlobal : EvqTemporary; }

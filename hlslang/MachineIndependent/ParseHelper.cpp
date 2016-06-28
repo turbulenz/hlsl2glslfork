@@ -115,6 +115,213 @@ namespace {
 
 // --------------------------------------------------------------------------
 
+static bool IsReservedWord(const TString &str)
+{
+	static bool initialized = false;
+	static std::set<TString> reservedWords;
+	if (!initialized)
+	{
+		initialized = true;
+
+		reservedWords.insert("texture");
+		reservedWords.insert("textureLod");
+		reservedWords.insert("texture2D");
+		reservedWords.insert("texture3D");
+		reservedWords.insert("textureCube");
+		reservedWords.insert("texture2DLod");
+		reservedWords.insert("texture3DLod");
+		reservedWords.insert("textureCubeLod");
+		reservedWords.insert("textureSize");
+
+		reservedWords.insert("triangle");
+		reservedWords.insert("point");
+
+		reservedWords.insert("abort");
+		reservedWords.insert("abs");
+		reservedWords.insert("acos");
+		reservedWords.insert("all");
+		reservedWords.insert("AllMemoryBarrier");
+		reservedWords.insert("AllMemoryBarrierWithGroupSync");
+		reservedWords.insert("any");
+		reservedWords.insert("asdouble");
+		reservedWords.insert("asfloat");
+		reservedWords.insert("asin");
+		reservedWords.insert("asint");
+		reservedWords.insert("asint");
+		reservedWords.insert("asuint");
+		reservedWords.insert("asuint");
+		reservedWords.insert("atan");
+		reservedWords.insert("atan2");
+		reservedWords.insert("ceil");
+		reservedWords.insert("CheckAccessFullyMapped");
+		reservedWords.insert("clamp");
+		reservedWords.insert("clip");
+		reservedWords.insert("cos");
+		reservedWords.insert("cosh");
+		reservedWords.insert("countbits");
+		reservedWords.insert("cross");
+		reservedWords.insert("D3DCOLORtoUBYTE4");
+		reservedWords.insert("ddx");
+		reservedWords.insert("ddx_coarse");
+		reservedWords.insert("ddx_fine");
+		reservedWords.insert("ddy");
+		reservedWords.insert("ddy_coarse");
+		reservedWords.insert("ddy_fine");
+		reservedWords.insert("degrees");
+		reservedWords.insert("determinant");
+		reservedWords.insert("DeviceMemoryBarrier");
+		reservedWords.insert("DeviceMemoryBarrierWithGroupSync");
+		reservedWords.insert("distance");
+		reservedWords.insert("dot");
+		reservedWords.insert("dst");
+		reservedWords.insert("errorf");
+		reservedWords.insert("EvaluateAttributeAtCentroid");
+		reservedWords.insert("EvaluateAttributeAtSample");
+		reservedWords.insert("EvaluateAttributeSnapped");
+		reservedWords.insert("exp");
+		reservedWords.insert("exp2");
+		reservedWords.insert("f16tof32");
+		reservedWords.insert("f32tof16");
+		reservedWords.insert("faceforward");
+		reservedWords.insert("firstbithigh");
+		reservedWords.insert("firstbitlow");
+		reservedWords.insert("floor");
+		reservedWords.insert("fma");
+		reservedWords.insert("fmod");
+		reservedWords.insert("frac");
+		reservedWords.insert("frexp");
+		reservedWords.insert("fwidth");
+		reservedWords.insert("GetRenderTargetSampleCount");
+		reservedWords.insert("GetRenderTargetSamplePosition");
+		reservedWords.insert("GroupMemoryBarrier");
+		reservedWords.insert("GroupMemoryBarrierWithGroupSync");
+		reservedWords.insert("InterlockedAdd");
+		reservedWords.insert("InterlockedAnd");
+		reservedWords.insert("InterlockedCompareExchange");
+		reservedWords.insert("InterlockedCompareStore");
+		reservedWords.insert("InterlockedExchange");
+		reservedWords.insert("InterlockedMax");
+		reservedWords.insert("InterlockedMin");
+		reservedWords.insert("InterlockedOr");
+		reservedWords.insert("InterlockedXor");
+		reservedWords.insert("isfinite");
+		reservedWords.insert("isinf");
+
+		reservedWords.insert("isnan");
+		reservedWords.insert("ldexp");
+		reservedWords.insert("length");
+		reservedWords.insert("lerp");
+		reservedWords.insert("lit");
+		reservedWords.insert("log");
+		reservedWords.insert("log10");
+		reservedWords.insert("log2");
+		reservedWords.insert("mad");
+		reservedWords.insert("max");
+		reservedWords.insert("min");
+		reservedWords.insert("modf");
+		reservedWords.insert("msad4");
+		reservedWords.insert("mul");
+		reservedWords.insert("noise");
+		reservedWords.insert("normalize");
+		reservedWords.insert("pow");
+		reservedWords.insert("printf");
+		reservedWords.insert("Process2DQuadTessFactorsAvg");
+		reservedWords.insert("Process2DQuadTessFactorsMax");
+		reservedWords.insert("Process2DQuadTessFactorsMin");
+		reservedWords.insert("ProcessIsolineTessFactors");
+		reservedWords.insert("ProcessQuadTessFactorsAvg");
+		reservedWords.insert("ProcessQuadTessFactorsMax");
+		reservedWords.insert("ProcessQuadTessFactorsMin");
+		reservedWords.insert("ProcessTriTessFactorsAvg");
+		reservedWords.insert("ProcessTriTessFactorsMax");
+		reservedWords.insert("ProcessTriTessFactorsMin");
+		reservedWords.insert("radians");
+		reservedWords.insert("rcp");
+		reservedWords.insert("reflect");
+		reservedWords.insert("refract");
+		reservedWords.insert("reversebits");
+		reservedWords.insert("round");
+		reservedWords.insert("rsqrt");
+		reservedWords.insert("saturate");
+		reservedWords.insert("sign");
+		reservedWords.insert("sin");
+		reservedWords.insert("sincos");
+		reservedWords.insert("sinh");
+		reservedWords.insert("smoothstep");
+		reservedWords.insert("sqrt");
+		reservedWords.insert("step");
+		reservedWords.insert("tan");
+		reservedWords.insert("tanh");
+		reservedWords.insert("tex1D");
+		reservedWords.insert("tex1D");
+		reservedWords.insert("tex1Dbias");
+		reservedWords.insert("tex1Dgrad");
+		reservedWords.insert("tex1Dlod");
+		reservedWords.insert("tex1Dproj");
+		reservedWords.insert("tex2D");
+		reservedWords.insert("tex2D");
+		reservedWords.insert("tex2Dbias");
+		reservedWords.insert("tex2Dgrad");
+		reservedWords.insert("tex2Dlod");
+		reservedWords.insert("tex2Dproj");
+		reservedWords.insert("tex3D");
+		reservedWords.insert("tex3D");
+		reservedWords.insert("tex3Dbias");
+		reservedWords.insert("tex3Dgrad");
+		reservedWords.insert("tex3Dlod");
+		reservedWords.insert("tex3Dproj");
+		reservedWords.insert("texCUBE");
+		reservedWords.insert("texCUBE");
+		reservedWords.insert("texCUBEbias");
+		reservedWords.insert("texCUBEgrad");
+		reservedWords.insert("texCUBElod");
+		reservedWords.insert("texCUBEproj");
+		reservedWords.insert("transpose");
+		reservedWords.insert("trunc");
+
+		// Reserved by compiler
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/bb509569(v=vs.85).aspx
+		reservedWords.insert("auto");
+		reservedWords.insert("case");
+		reservedWords.insert("catch");
+		reservedWords.insert("char");
+		reservedWords.insert("class");
+		reservedWords.insert("const_cast");
+		reservedWords.insert("default");
+		reservedWords.insert("delete");
+		reservedWords.insert("dynamic_cast");
+		reservedWords.insert("enum");
+		reservedWords.insert("explicit");
+		reservedWords.insert("friend");
+		reservedWords.insert("goto");
+		reservedWords.insert("long");
+		reservedWords.insert("mutable");
+		reservedWords.insert("new");
+		reservedWords.insert("operator");
+		reservedWords.insert("private");
+		reservedWords.insert("protected");
+		reservedWords.insert("public");
+		reservedWords.insert("reinterpret_cast");
+		reservedWords.insert("short");
+		reservedWords.insert("signed");
+		reservedWords.insert("sizeof");
+		reservedWords.insert("static_cast");
+		reservedWords.insert("template");
+		reservedWords.insert("this");
+		reservedWords.insert("throw");
+		reservedWords.insert("try");
+		reservedWords.insert("typename");
+		reservedWords.insert("union");
+		reservedWords.insert("unsigned");
+		reservedWords.insert("using");
+		reservedWords.insert("virtual");
+
+	}
+
+	return (reservedWords.end() != reservedWords.find(str));
+}
+
+// --------------------------------------------------------------------------
 
 TIntermTyped* TParseContext::add_binary(TOperator op, TIntermTyped* a, TIntermTyped* b, TSourceLoc line, const char* name, bool boolResult)
 {
@@ -591,7 +798,9 @@ bool TParseContext::globalErrorCheck(const TSourceLoc& line, bool global, const 
 //
 // Returns true if there was an error.
 //
-bool TParseContext::reservedErrorCheck(const TSourceLoc& line, const TString& identifier)
+bool TParseContext::reservedErrorCheck(const TSourceLoc& line,
+				       const TString& identifier,
+				       const bool decl)
 {
    if (!symbolTable.atBuiltInLevel())
    {
@@ -600,11 +809,21 @@ bool TParseContext::reservedErrorCheck(const TSourceLoc& line, const TString& id
          error(line, "reserved built-in name", "gl_", "");
          return true;
       }
+
+      // If it's part of a declaration, we can't use reserved words.
+      if (decl && IsReservedWord(identifier))
+      {
+	      error(line, "reserved word ", identifier.c_str(), "");
+	      return true;
+      }
+
+#if 0
       if (identifier.find("__") != TString::npos)
       {
          infoSink.info.message(EPrefixWarning, "Two consecutive underscores are reserved for future use.", line);
          return false;
       }
+#endif
    }
 
    return false;

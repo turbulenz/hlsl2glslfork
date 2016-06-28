@@ -363,9 +363,40 @@ TGlslOutputTraverser::TGlslOutputTraverser(TInfoSink& i, std::vector<GlslFunctio
 	current = global;
 }
 
+/// Recurse though a structure of nodes and store each float value in initData
+static void convertInitData(TVector<float> &initData, TIntermTyped *initDataNode)
+{
+	TIntermAggregate *agg = initDataNode->getAsAggregate();
+	if (agg)
+	{
+		TNodeArray &nodes = agg->getNodes();
+		for (TIntermNode *n : nodes)
+		{
+			TIntermTyped *t = n->getAsTyped();
+			if (t)
+			{
+				convertInitData(initData, t);
+			}
+		}
+		return;
+	}
 
+	TIntermConstant *c = initDataNode->getAsConstant();
+	if (c)
+	{
+		const unsigned count = c->getCount();
+		for (unsigned i = 0 ; i < count ; ++i)
+		{
+			initData.push_back(c->toFloat(i));
+		}
+		return;
+	}
 
-void TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
+	fprintf(stderr, "warning: unrecognized initialization data\n");
+}
+
+void
+TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 {
 	assert(decl->containsArrayInitialization());
 	
@@ -373,9 +404,9 @@ void TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* 
 	TType& type = *decl->getTypePointer();
 	EGlslSymbolType symbol_type = translateType(decl->getTypePointer());
 	
-	const bool emit_120_arrays = (m_TargetVersion >= ETargetGLSL_120);
-	const bool emit_old_arrays = !emit_120_arrays || m_ArrayInitWorkaround;
-	const bool emit_both = emit_120_arrays && emit_old_arrays;
+	const bool emit_120_arrays = false; // (m_TargetVersion >= ETargetGLSL_120);
+	const bool emit_old_arrays = true; // !emit_120_arrays || m_ArrayInitWorkaround;
+	const bool emit_both = false; // emit_120_arrays && emit_old_arrays;
 	
 	if (emit_both)
 	{
@@ -475,51 +506,23 @@ void TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* 
 	}
 }
 
-/// Recurse though a structure of nodes and store each float value in initData
-static void convertInitData(TVector<float> &initData, TIntermTyped *initDataNode)
-{
-	TIntermAggregate *agg = initDataNode->getAsAggregate();
-	if (agg)
-	{
-		TNodeArray &nodes = agg->getNodes();
-		for (TIntermNode *n : nodes)
-		{
-			TIntermTyped *t = n->getAsTyped();
-			if (t)
-			{
-				convertInitData(initData, t);
-			}
-		}
-		return;
-	}
-
-	TIntermConstant *c = initDataNode->getAsConstant();
-	if (c)
-	{
-		const unsigned count = c->getCount();
-		for (unsigned i = 0 ; i < count ; ++i)
-		{
-			initData.push_back(c->toFloat(i));
-		}
-		return;
-	}
-
-	fprintf(stderr, "warning: unrecognized initialization data\n");
-}
-
-bool TGlslOutputTraverser::traverseDeclaration(bool preVisit, TIntermDeclaration* decl, TIntermTraverser* it)
+bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
+					       TIntermDeclaration* decl,
+					       TIntermTraverser* it)
 {
 	TGlslOutputTraverser* goit = static_cast<TGlslOutputTraverser*>(it);
 	GlslFunction *current = goit->current;
 	std::stringstream& out = current->getActiveOutput();
-	
-	if (decl->containsArrayInitialization())
+	TType& type = *decl->getTypePointer();
+
+	// Const arrays are initialized in the usual way.
+
+	if (decl->containsArrayInitialization() && EvqConst == type.getQualifier())
 	{
 		goit->traverseArrayDeclarationWithInit (decl);
 		return false;
 	}
 
-	TType& type = *decl->getTypePointer();
 	if (type.getBasicType() == EbtTexture)
 	{
 		// right now we can't do anything with "texture" type, just skip it
@@ -549,7 +552,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit, TIntermDeclaration
 		(goit->m_TargetVersion >= ETargetGLSL_120) &&
 		(goit->m_TargetVersion != ETargetGLSL_ES_300) &&
 		!IsSampler(type.getBasicType());
-
+	
 	if (!can_have_global_init && decl->hasInitialization() && type.getQualifier() != EvqConst)
 	{
 		TIntermBinary* initNode = decl->getDeclaration()->getAsBinaryNode();
@@ -575,12 +578,28 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit, TIntermDeclaration
 			}
 		}
 	}
-	
+
+	// For global arrays, just parse the symbol and skip the initializer
+	if (!skipInitializer && type.isArray() && decl->hasInitialization())
+	{
+		TIntermBinary* initNode = decl->getDeclaration()->getAsBinaryNode();
+		TIntermSymbol* symbol = initNode->getLeft()->getAsSymbolNode();
+		if (symbol && symbol->isGlobal())
+		{
+			skipInitializer = true;
+			symbol->traverse(goit);
+			out << "[" << type.getArraySize() << "]";
+		}
+	}
+    
 	if (!skipInitializer)
+	{
 		decl->getDeclaration()->traverse(goit);
-	
-	if (type.isArray())
-		out << "[" << type.getArraySize() << "]";
+		if (type.isArray())
+		{
+			out << "[" << type.getArraySize() << "]";
+		}
+	}
 	
 	if (!IsSampler(type.getBasicType()) &&
 	    decl->hasInitialization() &&
