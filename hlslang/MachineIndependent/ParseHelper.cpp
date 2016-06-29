@@ -20,12 +20,12 @@ namespace {
 		TIntermSelection* sel;
 		TIntermTyped* t;
 	};
-	
+
 	inline bool isConst(TQualifier q)
 	{
 		return q == EvqConst;
 	}
-	
+
 	inline bool isConst(TOperator op)
 	{
 		switch (op) {
@@ -118,7 +118,7 @@ namespace {
 static bool IsReservedWord(const TString &str)
 {
 	static bool initialized = false;
-	static std::set<TString> reservedWords;
+	static std::set<std::string> reservedWords;
 	if (!initialized)
 	{
 		initialized = true;
@@ -318,7 +318,7 @@ static bool IsReservedWord(const TString &str)
 
 	}
 
-	return (reservedWords.end() != reservedWords.find(str));
+	return (reservedWords.end() != reservedWords.find(str.c_str()));
 }
 
 // --------------------------------------------------------------------------
