@@ -170,6 +170,7 @@ enum TOperator
 	EOpTex2DArray,
 	EOpTex2DArrayLod,
 	EOpTex2DArrayBias,
+	EOpTex2DArrayGrad,
 
 	EOpTranspose,
 	EOpDeterminant,

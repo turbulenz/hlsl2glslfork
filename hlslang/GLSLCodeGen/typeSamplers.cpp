@@ -267,6 +267,7 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
 		case EOpTex2DArray:
 		case EOpTex2DArrayLod:
 		case EOpTex2DArrayBias:
+		case EOpTex2DArrayGrad:
 		{
 			TNodeArray& nodes = node->getNodes();
 			assert(nodes.size());

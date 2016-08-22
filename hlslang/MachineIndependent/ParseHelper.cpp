@@ -60,6 +60,10 @@ namespace {
 			case EOpTexCubeGrad:
 			case EOpTexRect:
 			case EOpTexRectProj:
+			case EOpTex2DArray:
+			case EOpTex2DArrayLod:
+			case EOpTex2DArrayBias:
+			case EOpTex2DArrayGrad:
 			case EOpAssign:
 			case EOpAddAssign:
 			case EOpSubAssign:

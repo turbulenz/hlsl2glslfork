@@ -492,6 +492,7 @@ void TBuiltIns::initialize()
 	   s.append(TString("float4 tex2DArray(sampler2DArray s, float3 coord);"));
 	   s.append(TString("float4 tex2DArraylod(sampler2DArray s, float4 coord);"));
 	   s.append(TString("float4 tex2DArraybias(sampler2DArray s, float4 coord);"));
+	   s.append(TString("float4 tex2DArraygrad(sampler2DArray s, float3 coord, float2 ddx, float2 ddy);"));
 
       s.append(TString("float4 tex1D(sampler s, float coord);"));
       s.append(TString("float4 tex1D(sampler s, float coord, float ddx, float ddy);"));
@@ -666,6 +667,7 @@ void IdentifyBuiltIns(EShLanguage language, TSymbolTable& symbolTable)
 	symbolTable.relateToOperator("tex2DArray",      EOpTex2DArray);
 	symbolTable.relateToOperator("tex2DArraylod",   EOpTex2DArrayLod);
 	symbolTable.relateToOperator("tex2DArraybias",  EOpTex2DArrayBias);
+	symbolTable.relateToOperator("tex2DArraygrad",  EOpTex2DArrayGrad);
 
    symbolTable.relateToOperator("saturate",     EOpSaturate);
    symbolTable.relateToOperator("modf",         EOpModf);

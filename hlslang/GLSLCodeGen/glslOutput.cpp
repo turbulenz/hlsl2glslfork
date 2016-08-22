@@ -1840,6 +1840,10 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
 		current->addLibFunction(EOpTex2DArrayBias);
 		writeTex("xll_tex2DArrayBias", node, goit);
 		return false;
+	case EOpTex2DArrayGrad:
+		current->addLibFunction(EOpTex2DArrayGrad);
+		writeTex("xll_tex2DArrayGrad", node, goit);
+		return false;
 
    case EOpModf:
       current->addLibFunction(EOpModf);

@@ -160,6 +160,10 @@ void insertPre130TextureLookups()
 	hlslSupportLibExtensions->insert (std::make_pair(EOpTex2DArrayBias, std::make_pair("GL_EXT_texture_array","GL_EXT_texture_array")));
 	hlslSupportLibESOverrides->insert(CodeMap::value_type(EOpTex2DArrayBias, "vec4 xll_tex2DArrayBias(sampler2DArrayNV s, vec4 coord) { return texture2DArrayNV (s, coord.xyz, coord.w); }\n"));
 	hlslSupportLibExtensionsESOverrides->insert (std::make_pair(EOpTex2DArrayBias, std::make_pair("GL_NV_texture_array","GL_NV_texture_array")));
+
+	hlslSupportLib->insert(CodeMap::value_type(EOpTex2DArrayGrad, "vec4 xll_tex2DArrayGrad(sampler2DArray s, vec3 coord, vec2 ddx, vec2 ddy) { return texture2DArrayGrad (s, coord, ddx, ddy); }\n"));
+	hlslSupportLibExtensions->insert (std::make_pair(EOpTex2DArrayGrad, std::make_pair("GL_EXT_gpu_shader4","GL_EXT_gpu_shader4")));
+
 }
 
 void insertPost120TextureLookups()
@@ -327,6 +331,9 @@ void insertPost120TextureLookups()
 	hlslSupportLib->insert(CodeMap::value_type(EOpTex2DArray, "vec4 xll_tex2DArray(sampler2DArray s, vec3 coord) { return texture (s, coord); }\n"));
 	hlslSupportLib->insert(CodeMap::value_type(EOpTex2DArrayLod, "vec4 xll_tex2DArrayLod(sampler2DArray s, vec4 coord) { return textureLod (s, coord.xyz, coord.w); }\n"));
 	hlslSupportLib->insert(CodeMap::value_type(EOpTex2DArrayBias, "vec4 xll_tex2DArrayBias(sampler2DArray s, vec4 coord) { return texture (s, coord.xyz, coord.w); }\n"));
+
+	hlslSupportLib->insert(CodeMap::value_type(EOpTex2DArrayGrad, "vec4 xll_tex2DArrayGrad(sampler2DArray s, vec3 coord, vec2 ddx, vec2 ddy) { return textureGrad (s, coord, ddx, ddy); }\n"));
+
 }
 
 
