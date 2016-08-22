@@ -15,7 +15,7 @@
 //
 
 //
-// Use this class to carry along data from node to node in 
+// Use this class to carry along data from node to node in
 // the traversal
 //
 class TOutputTraverser : public TIntermTraverser
@@ -44,7 +44,7 @@ TString TType::getCompleteString() const
       p += sprintf(p, "vec%d", matrows);
 
    return TString(buf);
-}   
+}
 
 //
 // Helper functions for printing, not part of traversing.
@@ -201,10 +201,10 @@ bool OutputUnary(bool, /* preVisit */ TIntermUnary* node, TIntermTraverser* it)
 
    case EOpLength:         out.debug << "length";               break;
    case EOpNormalize:      out.debug << "normalize";            break;
-   case EOpDPdx:           out.debug << "dPdx";                 break;               
-   case EOpDPdy:           out.debug << "dPdy";                 break;   
-   case EOpFwidth:         out.debug << "fwidth";               break;   
-   case EOpFclip:           out.debug << "clip";               break; 
+   case EOpDPdx:           out.debug << "dPdx";                 break;
+   case EOpDPdy:           out.debug << "dPdy";                 break;
+   case EOpFwidth:         out.debug << "fwidth";               break;
+   case EOpFclip:           out.debug << "clip";               break;
 
    case EOpAny:            out.debug << "any";                  break;
    case EOpAll:            out.debug << "all";                  break;
@@ -328,7 +328,7 @@ bool OutputAggregate(bool, /* preVisit */ TIntermAggregate* node, TIntermTravers
    case EOpTex2DArray:		out.debug << "tex2DArray"; break;
    case EOpTex2DArrayLod:	out.debug << "tex2DArrayLod"; break;
    case EOpTex2DArrayBias:	out.debug << "tex2DArrayBias"; break;
- 
+
    default: out.debug.message(EPrefixError, "Bad aggregation op");
    }
 
@@ -415,7 +415,7 @@ void OutputConstant(TIntermConstant* node, TIntermTraverser* it)
             out.debug << buf << "\n";
             break;
          }
-      default: 
+      default:
          out.info.message(EPrefixInternalError, "Unknown constant", node->getLine());
          break;
       }
@@ -514,4 +514,3 @@ void ir_output_tree(TIntermNode* root, TInfoSink& infoSink)
 
    root->traverse(&it);
 }
-

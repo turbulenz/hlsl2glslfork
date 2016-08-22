@@ -837,7 +837,7 @@ void initializeHLSLSupportLibrary(ETargetVersion targetVersion)
         "    temp.x = xll_determinant_mf3x3( mat3( m[1].yzw, m[2].yzw, m[3].yzw));\n"
         "    temp.y = -xll_determinant_mf3x3( mat3( m[0].yzw, m[2].yzw, m[3].yzw));\n"
         "    temp.z = xll_determinant_mf3x3( mat3( m[0].yzw, m[1].yzw, m[3].yzw));\n"
-        "    temp.w = -xll_determinant_mf3x3( mat3( m[0].yzw, m[1].yzw, m[2].yzw));\n"    
+        "    temp.w = -xll_determinant_mf3x3( mat3( m[0].yzw, m[1].yzw, m[2].yzw));\n"
         "    return dot( m[0], temp);\n"
         "}\n")
         );

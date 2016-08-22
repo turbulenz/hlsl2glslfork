@@ -7,7 +7,7 @@
 #include "localintermediate.h"
 #include "glslOutput.h"
 
-struct TSamplerTraverser : public TIntermTraverser 
+struct TSamplerTraverser : public TIntermTraverser
 {
 	static void traverseSymbol(TIntermSymbol*, TIntermTraverser*);
 	static void traverseParameterSymbol(TIntermSymbol *node, TIntermTraverser *it);
@@ -17,24 +17,24 @@ struct TSamplerTraverser : public TIntermTraverser
 	static bool traverseAggregate(bool preVisit, TIntermAggregate*, TIntermTraverser*);
 	static bool traverseLoop(bool preVisit, TIntermLoop*, TIntermTraverser*);
 	static bool traverseBranch(bool preVisit, TIntermBranch*,  TIntermTraverser*);
-	
+
 	/// Set the type for the sampler
 	void typeSampler( TIntermTyped *node, TBasicType samp);
-	
+
 	TInfoSink& infoSink;
-	
+
 	bool abort;
-	
+
 	// These are used to go into "typing mode"
 	bool typing;
 	int id;
 	TBasicType sampType;
-	
+
 	std::map<std::string,TNodeArray* > functionMap;
-	
+
 	std::string currentFunction;
-	
-	TSamplerTraverser(TInfoSink &is) : infoSink(is), abort(false), typing(false), id(0), sampType(EbtSamplerGeneric) 
+
+	TSamplerTraverser(TInfoSink &is) : infoSink(is), abort(false), typing(false), id(0), sampType(EbtSamplerGeneric)
 	{
 		visitSymbol = traverseSymbol;
 		//visitConstant = traverseConstant;
@@ -80,7 +80,7 @@ bool TSamplerTraverser::traverseBinary( bool preVisit, TIntermBinary *node, TInt
 
    case EOpIndexDirect:
    case EOpIndexIndirect:
-      //not planning to support arrays of samplers with different types 
+      //not planning to support arrays of samplers with different types
       break;
 
    case EOpIndexDirectStruct:
@@ -124,10 +124,10 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
    {
       switch (node->getOp())
       {
-      
+
       case EOpFunction:
          // Store the current function name to use to setup the parameters
-         sit->currentFunction = node->getName().c_str(); 
+         sit->currentFunction = node->getName().c_str();
          break;
 
       case EOpParameters:
@@ -144,7 +144,7 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
             {
                // Get the sequence of function parameters
                TNodeArray *funcSequence = sit->functionMap[node->getName().c_str()];
-               
+
                // Get the sequence of parameters being passed to function
                TNodeArray& nodes = node->getNodes();
 
@@ -159,7 +159,7 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
                   {
                      TIntermSymbol *sym = (*symit)->getAsSymbolNode();
                      TIntermSymbol *funcSym = (*funcIt)->getAsSymbolNode();
-                     
+
                      if ( sym != NULL && funcSym != NULL)
                      {
                         // If the parameter is generic, and the sampler to which
@@ -208,7 +208,7 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
             }
 
          }
-         // We need to continue the traverse here, because the calls could be nested 
+         // We need to continue the traverse here, because the calls could be nested
          break;
 
 
@@ -240,9 +240,9 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
             }
 
          }
-         // We need to continue the traverse here, because the calls could be nested 
+         // We need to continue the traverse here, because the calls could be nested
          break;
-			  
+
 		case EOpShadow2D:
 		case EOpShadow2DProj:
 		{
@@ -283,10 +283,10 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
 				assert(0);
 			}
 		  }
-		
-		// We need to continue the traverse here, because the calls could be nested 
+
+		// We need to continue the traverse here, because the calls could be nested
 		break;
-			  
+
 	  case EOpTexRect:
 	  case EOpTexRectProj:
 		  {
@@ -310,12 +310,12 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
 			  {
 				  assert(0);
 			  }
-			  
+
 		  }
-		  // We need to continue the traverse here, because the calls could be nested 
+		  // We need to continue the traverse here, because the calls could be nested
 		  break;
-			  
-			  
+
+
       case EOpTex3D:
       case EOpTex3DProj:
       case EOpTex3DLod:
@@ -344,7 +344,7 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
             }
 
          }
-         // We need to continue the traverse here, because the calls could be nested 
+         // We need to continue the traverse here, because the calls could be nested
          break;
 
       case EOpTexCube:
@@ -375,10 +375,10 @@ bool TSamplerTraverser::traverseAggregate( bool preVisit, TIntermAggregate *node
             }
 
          }
-         // We need to continue the traverse here, because the calls could be nested 
+         // We need to continue the traverse here, because the calls could be nested
          break;
 
-      default: 
+      default:
          break;
       }
    }

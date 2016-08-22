@@ -6,7 +6,7 @@
 // Definition of the in-memory high-level intermediate representation
 // of shaders.  This is a tree that parser creates.
 //
-// Nodes in the tree are defined as a hierarchy of classes derived from 
+// Nodes in the tree are defined as a hierarchy of classes derived from
 // TIntermNode. Each is a node in a tree.  There is no preset branching factor;
 // each node can have it's own type of list of children.
 
@@ -26,7 +26,7 @@ enum TOperator
 {
 	EOpNull,            // if in a node, should only mean a node is still being built
 	EOpSequence,        // denotes a list of statements, or parameters, etc.
-	EOpFunctionCall,    
+	EOpFunctionCall,
 	EOpFunction,        // For function definition
 	EOpParameters,      // an aggregate listing the parameters to a function
 
@@ -369,7 +369,7 @@ enum TLoopType
 class TIntermLoop : public TIntermNode
 {
 public:
-	TIntermLoop(TLoopType aType, TIntermTyped* aCond, TIntermTyped* aExpr, TIntermNode* aBody) : 
+	TIntermLoop(TLoopType aType, TIntermTyped* aCond, TIntermTyped* aExpr, TIntermNode* aBody) :
 	type(aType),
 	cond(aCond),
 	expr(aExpr),
@@ -382,7 +382,7 @@ public:
 	TIntermTyped* getCondition() { return cond; }
 	TIntermTyped* getExpression() { return expr; }
 	TIntermNode*  getBody() { return body; }
-	
+
 protected:
 	TLoopType	type;
 	TIntermTyped* cond;  // loop exit condition, could be 0 for for-loops
@@ -419,16 +419,16 @@ public:
 	// if symbol is initialized as symbol(sym), the memory comes from the poolallocator of sym. If sym comes from
 	// per process globalpoolallocator, then it causes increased memory usage per compile
 	// it is essential to use "symbol = sym" to assign to symbol
-	TIntermSymbol(int i, const TString& sym, const TType& t) : 
+	TIntermSymbol(int i, const TString& sym, const TType& t) :
 		TIntermTyped(t), id(i), info(0), global(false)
 	{
 		symbol = sym;
-	} 
-	TIntermSymbol(int i, const TString& sym, const TTypeInfo *inf, const TType& t) : 
+	}
+	TIntermSymbol(int i, const TString& sym, const TTypeInfo *inf, const TType& t) :
 		TIntermTyped(t), id(i), info(inf), global(false)
 	{
 		symbol = sym;
-	} 
+	}
 
 	int getId() const { return id; }
 	const TString& getSymbol() const { return symbol; }
@@ -454,11 +454,11 @@ protected:
 class TIntermDeclaration : public TIntermTyped {
 public:
 	TIntermDeclaration(const TType& type) : TIntermTyped(type), _declaration(NULL) {
-		
+
 	}
 	virtual void traverse(TIntermTraverser*);
 	virtual TIntermDeclaration* getAsDeclaration() { return this; }
-	
+
 	bool hasInitialization() const { return _declaration->getAsBinaryNode() != NULL; }
 	TIntermTyped*& getDeclaration() { return _declaration; }
 	/* @TODO
@@ -480,7 +480,7 @@ public:
 	}
 	*/
 	bool containsArrayInitialization() const { return isArray() && hasInitialization(); }
-	
+
 private:
 	TIntermTyped* _declaration;
 };
@@ -506,7 +506,7 @@ public:
 			bool asBool;
 		};
 	};
-	
+
 	#define defset(i, t) Value& v = values[(i)]; v.as##t = (val); v.type = Ebt##t
 	void setValue(unsigned val)			{ defset(0, Int); }
 	void setValue(int val)				{ defset(0, Int); }
@@ -521,14 +521,14 @@ public:
 	float toFloat(unsigned i = 0) { return values[i].asFloat; }
 	bool toBool(unsigned i = 0) { return values[i].asBool; }
 	#undef defset
-	
+
 	const Value& getValue(unsigned i = 0) const { return values[i]; }
 	Value& getValue(unsigned i = 0) { return values[i]; }
-	
+
 	unsigned getCount() {
 		return values.size();
 	}
-	
+
 	void copyValuesFrom(const TIntermConstant& c) { values = c.values; }
 
 	virtual void traverse(TIntermTraverser* );
@@ -537,7 +537,7 @@ protected:
 		if (values.size() <= ix)
 			values.resize(ix + 1);
 	}
-	
+
 	typedef TVector<Value> Values;
 	Values values;
 };
@@ -559,10 +559,10 @@ public:
 	{
 		return this;
 	}
-	
+
 protected:
 	TIntermOperator(TOperator o) : TIntermTyped(TType(EbtFloat, EbpUndefined)), op(o) {}
-	TIntermOperator(TOperator o, TType& t) : TIntermTyped(t), op(o) {}   
+	TIntermOperator(TOperator o, TType& t) : TIntermTyped(t), op(o) {}
 	TOperator op;
 };
 
@@ -587,7 +587,7 @@ public:
 		return this;
 	}
 	virtual bool promote(TParseContext& ctx);
-	
+
 protected:
 	TIntermTyped* left;
 	TIntermTyped* right;
@@ -611,7 +611,7 @@ public:
 	TIntermTyped* getOperand() { return operand; }
 
 	virtual bool promote(TParseContext& ctx);
-	
+
 private:
 	TIntermTyped* operand;
 };
@@ -653,7 +653,7 @@ private:
 	// no copying
 	TIntermAggregate(const TIntermAggregate&);
 	TIntermAggregate& operator=(const TIntermAggregate&);
-	
+
 	TNodeArray nodes;
 	TString name;
 	TString plainName;
@@ -678,7 +678,7 @@ public:
 	TIntermSelection* getAsSelectionNode() { return this; }
 
 	bool promoteTernary(TInfoSink&);
-	
+
 private:
    TIntermTyped* condition;
    TIntermNode* trueBlock;
@@ -686,7 +686,7 @@ private:
 };
 
 //
-// For traversing the tree.  User should derive from this, 
+// For traversing the tree.  User should derive from this,
 // put their traversal specific data in it, and then pass
 // it to a Traverse method.
 //
@@ -698,8 +698,8 @@ class TIntermTraverser
 public:
 	POOL_ALLOCATOR_NEW_DELETE(GlobalPoolAllocator)
 
-	TIntermTraverser() : 
-		visitSymbol(0), 
+	TIntermTraverser() :
+		visitSymbol(0),
 		visitConstant(0),
 		visitBinary(0),
 		visitUnary(0),
@@ -730,4 +730,3 @@ public:
 };
 
 #endif // __INTERMEDIATE_H
-

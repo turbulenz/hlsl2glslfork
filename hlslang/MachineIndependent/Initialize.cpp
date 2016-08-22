@@ -5,7 +5,7 @@
 
 //
 // Create strings that declare built-in definitions, add built-ins that
-// cannot be expressed in the files, and establish mappings between 
+// cannot be expressed in the files, and establish mappings between
 // built-in functions and operators.
 //
 
@@ -104,7 +104,7 @@ void TBuiltIns::initialize()
       s.append(TString("float3x3  acos(float3x3  x);"));
       s.append(TString("float4x4  acos(float4x4  x);"));
 
-      s.append(TString("float atan2(float y, float x);")); 
+      s.append(TString("float atan2(float y, float x);"));
       s.append(TString("float2  atan2(float2  y, float2  x);"));
       s.append(TString("float3  atan2(float3  y, float3  x);"));
       s.append(TString("float4  atan2(float4  y, float4  x);"));
@@ -170,7 +170,7 @@ void TBuiltIns::initialize()
       s.append(TString("float2x2  log10(float2x2  x);"));
       s.append(TString("float3x3  log10(float3x3  x);"));
       s.append(TString("float4x4  log10(float4x4  x);"));
-      
+
       s.append(TString("float sqrt(float x);"));
       s.append(TString("float2  sqrt(float2  x);"));
       s.append(TString("float3  sqrt(float3  x);"));
@@ -179,7 +179,7 @@ void TBuiltIns::initialize()
       s.append(TString("float3x3  sqrt(float3x3  x);"));
       s.append(TString("float4x4  sqrt(float4x4  x);"));
 
-      
+
       //DX HLSL versions
       s.append(TString("float   rsqrt(float x);"));
       s.append(TString("float2  rsqrt(float2  x);"));
@@ -237,7 +237,7 @@ void TBuiltIns::initialize()
       s.append(TString("float2  fmod(float2  x, float2  y);"));
       s.append(TString("float3  fmod(float3  x, float3  y);"));
       s.append(TString("float4  fmod(float4  x, float4  y);"));
-      
+
       s.append(TString("float min(float x, float y);"));
       s.append(TString("float2  min(float2  x, float2  y);"));
       s.append(TString("float3  min(float3  x, float3  y);"));
@@ -280,19 +280,19 @@ void TBuiltIns::initialize()
 	  s.append(TString("float3 modf(float3 x, out float3 ip);"));
 	  s.append(TString("float4 modf(float4 x, out int4 ip);"));
 	  s.append(TString("float4 modf(float4 x, out float4 ip);"));
-	   
+
 	   // HLSL round
 	   s.append(TString("float round(float x);"));
 	   s.append(TString("float2 round(float2 x);"));
 	   s.append(TString("float3 round(float3 x);"));
-	   s.append(TString("float4 round(float4 x);"));	   
-	   
+	   s.append(TString("float4 round(float4 x);"));
+
 	   // HLSL trunc
 	   s.append(TString("float trunc(float x);"));
 	   s.append(TString("float2 trunc(float2 x);"));
 	   s.append(TString("float3 trunc(float3 x);"));
-	   s.append(TString("float4 trunc(float4 x);"));	   
-	   
+	   s.append(TString("float4 trunc(float4 x);"));
+
       // HLSL ldexp
       s.append(TString("float ldexp(float x, float expon);"));
       s.append(TString("float2 ldexp(float2 x, float2 expon);"));
@@ -309,7 +309,7 @@ void TBuiltIns::initialize()
       s.append(TString("void sincos(float4 x, out float4 s, out float4 c);"));
       s.append(TString("void sincos(float2x2 x, out float2x2 s, out float2x2 c);"));
       s.append(TString("void sincos(float3x3 x, out float3x3 s, out float3x3 c);"));
-      s.append(TString("void sincos(float4x4 x, out float4x4 s, out float4x4 c);"));        
+      s.append(TString("void sincos(float4x4 x, out float4x4 s, out float4x4 c);"));
 
       //DX HLSL versions
       s.append(TString("float   lerp(float x, float y, float a);"));
@@ -335,7 +335,7 @@ void TBuiltIns::initialize()
       s.append(TString("float2x2  smoothstep(float2x2  edge0, float2x2  edge1, float2x2  x);"));
       s.append(TString("float3x3  smoothstep(float3x3  edge0, float3x3  edge1, float3x3  x);"));
       s.append(TString("float4x4  smoothstep(float4x4  edge0, float4x4  edge1, float4x4  x);"));
-      
+
 
       s.append(TString("float4   lit(float n_dot_l, float n_dot_h, float m);"));
 
@@ -479,20 +479,20 @@ void TBuiltIns::initialize()
       s.append(TString("float4 texCUBEbias(samplerCUBE s, float4 coord);"));
       s.append(TString("float4 texCUBElod(samplerCUBE s, float4 coord);"));
       s.append(TString("float4 texCUBEgrad(samplerCUBE s, float3 coord, float3 ddx, float3 ddy);"));
-	   
+
       s.append(TString("float4 texRECT(samplerRECT s, float2 coord);"));
       s.append(TString("float4 texRECT(samplerRECTShadow s, float3 coord);"));
       s.append(TString("float4 texRECTproj(samplerRECT s, float4 coord);"));
       s.append(TString("float4 texRECTproj(samplerRECTShadow s, float4 coord);"));
       s.append(TString("float4 texRECTproj(samplerRECT s, float3 coord);"));
-	   
+
 		s.append(TString("float shadow2D(sampler2DShadow s, float3 coord);"));
 		s.append(TString("float shadow2Dproj(sampler2DShadow s, float4 coord);"));
 
 	   s.append(TString("float4 tex2DArray(sampler2DArray s, float3 coord);"));
 	   s.append(TString("float4 tex2DArraylod(sampler2DArray s, float4 coord);"));
 	   s.append(TString("float4 tex2DArraybias(sampler2DArray s, float4 coord);"));
-	   
+
       s.append(TString("float4 tex1D(sampler s, float coord);"));
       s.append(TString("float4 tex1D(sampler s, float coord, float ddx, float ddy);"));
       s.append(TString("float4 tex1Dproj(sampler s, float4 coord);"));
@@ -524,7 +524,7 @@ void TBuiltIns::initialize()
 	   s.append(TString("float4 texRECT(sampler s, float2 coord);"));
 	   s.append(TString("float4 texRECTproj(sampler s, float4 coord);"));
 	   s.append(TString("float4 texRECTproj(sampler s, float3 coord);"));
-	   
+
 
       //
       // Noise functions.
@@ -679,7 +679,7 @@ void IdentifyBuiltIns(EShLanguage language, TSymbolTable& symbolTable)
 
    switch (language)
    {
-   
+
    case EShLangVertex:
 
    case EShLangFragment:

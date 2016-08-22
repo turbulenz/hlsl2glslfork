@@ -15,7 +15,7 @@
 //ACS: some texture lookup types were deprecated after 1.20, and 1.40 won't accept them
 bool UsePost120TextureLookups(ETargetVersion targetVersion) {
     if(targetVersion<ETargetVersionCount) {
-        return (targetVersion>ETargetGLSL_120); 
+        return (targetVersion>ETargetGLSL_120);
     }
     else {
         return false;
@@ -92,7 +92,7 @@ static void writeConstantConstructor (std::stringstream& out, EGlslSymbolType t,
 		writeType (out, t, structure, EbpUndefined);
 		out << "(";
 	}
-	
+
 	if (structure) {
 		// compound type
 		unsigned n_members = structure->memberCount();
@@ -133,9 +133,9 @@ static void writeConstantConstructor (std::stringstream& out, EGlslSymbolType t,
 }
 
 
-void writeComparison( const TString &compareOp, const TString &compareCall, TIntermBinary *node, TGlslOutputTraverser* goit ) 
+void writeComparison( const TString &compareOp, const TString &compareCall, TIntermBinary *node, TGlslOutputTraverser* goit )
 {
-   GlslFunction *current = goit->current;    
+   GlslFunction *current = goit->current;
    std::stringstream& out = current->getActiveOutput();
    bool bUseCompareCall = false;
 
@@ -162,12 +162,12 @@ void writeComparison( const TString &compareOp, const TString &compareCall, TInt
 
             node->getLeft()->traverse(goit);
 
-            out << " )";                
+            out << " )";
          }
          else
          {
             node->getLeft()->traverse(goit);
-         }         
+         }
       }
       out << ", ";
 
@@ -180,12 +180,12 @@ void writeComparison( const TString &compareOp, const TString &compareCall, TInt
 
             node->getRight()->traverse(goit);
 
-            out << " )";             
+            out << " )";
          }
          else
          {
             node->getRight()->traverse(goit);
-         }         
+         }
       }
       out << ")";
    }
@@ -208,12 +208,12 @@ void writeComparison( const TString &compareOp, const TString &compareCall, TInt
 void writeFuncCall( const TString &name, TIntermAggregate *node, TGlslOutputTraverser* goit, bool bGenMatrix = false, bool mangleName = false )
 {
    TNodeArray::iterator sit;
-   TNodeArray& nodes = node->getNodes(); 
+   TNodeArray& nodes = node->getNodes();
    GlslFunction *current = goit->current;
    std::stringstream& out = current->getActiveOutput();
 
    current->beginStatement();
-   
+
    if ( bGenMatrix )
    {
       if ( node->isMatrix () )
@@ -221,7 +221,7 @@ void writeFuncCall( const TString &name, TIntermAggregate *node, TGlslOutputTrav
          out << "xll_";
          current->addLibFunction ( node->getOp() );
       }
-   }      
+   }
 
    out << name;
 
@@ -234,7 +234,7 @@ void writeFuncCall( const TString &name, TIntermAggregate *node, TGlslOutputTrav
 			out << "_" << mangledType;
 		}
 	}
-   
+
    out << "( ";
 
 	for (sit = nodes.begin(); sit != nodes.end(); ++sit)
@@ -243,7 +243,7 @@ void writeFuncCall( const TString &name, TIntermAggregate *node, TGlslOutputTrav
 			out << ", ";
 		(*sit)->traverse(goit);
 	}
-	
+
    out << ")";
 }
 
@@ -251,7 +251,7 @@ void writeFuncCall( const TString &name, TIntermAggregate *node, TGlslOutputTrav
 void setupUnaryBuiltInFuncCall( const TString &name, TIntermUnary *node, TString &opStr, bool &funcStyle, bool &prefix,
                                 TGlslOutputTraverser* goit )
 {
-   GlslFunction *current = goit->current;   
+   GlslFunction *current = goit->current;
 
    funcStyle = true;
    prefix = true;
@@ -264,17 +264,17 @@ void setupUnaryBuiltInFuncCall( const TString &name, TIntermUnary *node, TString
    else
    {
       opStr = name;
-   }   
+   }
 }
 
 
 
 void writeTex( const TString &name, TIntermAggregate *node, TGlslOutputTraverser* goit )
 {
-	TNodeArray& nodes = node->getNodes(); 
+	TNodeArray& nodes = node->getNodes();
 	TBasicType sampler_type = (*nodes.begin())->getAsTyped()->getBasicType();
 	TString new_name;
-	
+
     //ACS: do we need to change these for 1.40? 1.20-style texture lookups should just not show up at all, right?
 	if (isShadowSampler(sampler_type)) {
 		if (name == "texture2D")
@@ -294,7 +294,7 @@ void writeTex( const TString &name, TIntermAggregate *node, TGlslOutputTraverser
 	} else {
 		new_name = name;
 	}
-	
+
 	writeFuncCall(new_name, node, goit);
 }
 
@@ -351,7 +351,7 @@ TGlslOutputTraverser::TGlslOutputTraverser(TInfoSink& i, std::vector<GlslFunctio
 	visitLoop = traverseLoop;
 	visitBranch = traverseBranch;
 	visitDeclaration = traverseDeclaration;
-	
+
 	TSourceLoc oneSourceLoc;
 	oneSourceLoc.file=NULL;
 	oneSourceLoc.line=1;
@@ -399,36 +399,36 @@ void
 TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 {
 	assert(decl->containsArrayInitialization());
-	
+
 	std::stringstream* out = &current->getActiveOutput();
 	TType& type = *decl->getTypePointer();
 	EGlslSymbolType symbol_type = translateType(decl->getTypePointer());
-	
+
 	const bool emit_120_arrays = false; // (m_TargetVersion >= ETargetGLSL_120);
 	const bool emit_old_arrays = true; // !emit_120_arrays || m_ArrayInitWorkaround;
 	const bool emit_both = false; // emit_120_arrays && emit_old_arrays;
-	
+
 	if (emit_both)
 	{
 		current->indent(*out);
 		(*out) << "#if defined(HLSL2GLSL_ENABLE_ARRAY_120_WORKAROUND)" << std::endl;
 		current->increaseDepth();
 	}
-	
+
 	if (emit_old_arrays)
 	{
 		TQualifier q = type.getQualifier();
 		if (q == EvqConst)
 			q = EvqTemporary;
-		
+
 		current->beginStatement();
 		if (q != EvqTemporary && q != EvqGlobal)
 			(*out) << type.getQualifierString() << " ";
-		
+
 		TIntermBinary* assign = decl->getDeclaration()->getAsBinaryNode();
 		TIntermSymbol* sym = assign->getLeft()->getAsSymbolNode();
 		TNodeArray& init = assign->getRight()->getAsAggregate()->getNodes();
-		
+
 		writeType(*out, symbol_type, NULL, this->m_UsePrecision ? decl->getPrecision() : EbpUndefined);
 		(*out) << " " << sym->getSymbol() << "[" << type.getArraySize() << "]";
 		current->endStatement();
@@ -440,7 +440,7 @@ TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 			out = &m_DeferredArrayInit;
 			current->setActiveOutput(out);
 		}
-		
+
 		unsigned n_vals = init.size();
 		for (unsigned i = 0; i != n_vals; ++i) {
 			current->beginStatement();
@@ -459,7 +459,7 @@ TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 			}
 			current->endStatement();
 		}
-		
+
 		if (sym->isGlobal())
 		{
 			out = oldOut;
@@ -467,7 +467,7 @@ TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 			current->popDepth();
 		}
 	}
-	
+
 	if (emit_both)
 	{
 		current->decreaseDepth();
@@ -475,29 +475,29 @@ TGlslOutputTraverser::traverseArrayDeclarationWithInit(TIntermDeclaration* decl)
 		(*out) << "#else" << std::endl;
 		current->increaseDepth();
 	}
-	
+
 	if (emit_120_arrays)
-	{	
+	{
 		current->beginStatement();
-		
+
 		if (type.getQualifier() != EvqTemporary && type.getQualifier() != EvqGlobal)
 			(*out) << type.getQualifierString() << " ";
-		
+
 		if (type.getBasicType() == EbtStruct)
 			(*out) << type.getTypeName();
 		else
 			writeType(*out, symbol_type, NULL, this->m_UsePrecision ? decl->getPrecision() : EbpUndefined);
-		
+
 		if (type.isArray())
 			(*out) << "[" << type.getArraySize() << "]";
-		
+
 		(*out) << " ";
-		
+
 		decl->getDeclaration()->traverse(this);
-		
+
 		current->endStatement();
 	}
-	
+
 	if (emit_both)
 	{
 		current->decreaseDepth();
@@ -528,12 +528,12 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 		// right now we can't do anything with "texture" type, just skip it
 		return false;
 	}
-	
+
 	current->beginStatement();
-	
+
 	if (type.getQualifier() != EvqTemporary && type.getQualifier() != EvqGlobal)
 		out << type.getQualifierString() << " ";
-	
+
 	if (type.getBasicType() == EbtStruct)
 		out << type.getTypeName();
 	else
@@ -552,7 +552,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 		(goit->m_TargetVersion >= ETargetGLSL_120) &&
 		(goit->m_TargetVersion != ETargetGLSL_ES_300) &&
 		!IsSampler(type.getBasicType());
-	
+
 	if (!can_have_global_init && decl->hasInitialization() && type.getQualifier() != EvqConst)
 	{
 		TIntermBinary* initNode = decl->getDeclaration()->getAsBinaryNode();
@@ -561,7 +561,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 		{
 			skipInitializer = true;
 			symbol->traverse(goit);
-			
+
 			// If this isn't a uniform, and we couldn't just emit it's initialization,
 			// then emit initialization for later until main().
 			if (type.getQualifier() != EvqUniform)
@@ -591,7 +591,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 			out << "[" << type.getArraySize() << "]";
 		}
 	}
-    
+
 	if (!skipInitializer)
 	{
 		decl->getDeclaration()->traverse(goit);
@@ -600,7 +600,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 			out << "[" << type.getArraySize() << "]";
 		}
 	}
-	
+
 	if (!IsSampler(type.getBasicType()) &&
 	    decl->hasInitialization() &&
 	    type.getQualifier() != EvqConst)
@@ -615,7 +615,7 @@ bool TGlslOutputTraverser::traverseDeclaration(bool preVisit,
 			convertInitData(initData, initDataNode);
 		}
 	}
-    
+
 	current->endStatement();
 	return false;
 }
@@ -666,8 +666,8 @@ void TGlslOutputTraverser::traverseSymbol(TIntermSymbol *node, TIntermTraverser 
 				registerSpec = node->getInfo()->getRegister().c_str();
 				states = createStateList(node->getInfo()->getStates());
 			}
-			
-			
+
+
 			GlslSymbol * sym = new GlslSymbol(
 				node->getSymbol().c_str(),
 				semantic,
@@ -778,7 +778,7 @@ void TGlslOutputTraverser::traverseImmediateConstant( TIntermConstant *c, TInter
       goit->indexList.push_back((int)c->toFloat());
       break;
    default:
-      assert(false && "Invalid constant type. Only bool, int and float supported"); 
+      assert(false && "Invalid constant type. Only bool, int and float supported");
       goit->indexList.push_back(0);
    }
 }
@@ -1010,7 +1010,7 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
       goit->generatingCode = true;
       return false;
 
-	case EOpMatrixSwizzle:		   
+	case EOpMatrixSwizzle:
 		// This presently only works for swizzles as rhs operators
 		if (node->getRight())
 		{
@@ -1024,7 +1024,7 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
 
 			std::vector<int> elements = goit->indexList;
 			goit->indexList.clear();
-			
+
 			if (elements.size() > 4 || elements.size() < 1) {
 				goit->infoSink.info << "Matrix swizzle operations can must contain at least 1 and at most 4 element selectors.";
 				return true;
@@ -1043,14 +1043,14 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
 				sameColumn &= column[i] == column[i-1];
 
 			static const char* fields = "xyzw";
-			
+
 			if (sameColumn)
-			{				
+			{
 				//select column, then swizzle row
 				if (node->getLeft())
 					node->getLeft()->traverse(goit);
 				out << "[" << column[0] << "].";
-				
+
 				for (unsigned i = 0; i < elements.size(); ++i)
 					out << fields[row[i]];
 			}
@@ -1058,14 +1058,14 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
 			{
 				// Insert constructor, and dereference individually
 
-				// Might need to account for different types here 
+				// Might need to account for different types here
 				assert( elements.size() != 1); //should have hit same collumn case
 				out << "vec" << elements.size() << "(";
 				if (node->getLeft())
 					node->getLeft()->traverse(goit);
 				out << "[" << column[0] << "].";
 				out << fields[row[0]];
-				
+
 				for (unsigned i = 1; i < elements.size(); ++i)
 				{
 					out << ", ";
@@ -1089,30 +1089,30 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
    case EOpAnd:         op = "&"; infix = true; break;
    case EOpInclusiveOr: op = "|"; infix = true; break;
    case EOpExclusiveOr: op = "^"; infix = true; break;
-   case EOpEqual:       
+   case EOpEqual:
       writeComparison ( "==", "equal", node, goit );
-      return false;        
+      return false;
 
-   case EOpNotEqual:        
+   case EOpNotEqual:
       writeComparison ( "!=", "notEqual", node, goit );
-      return false;               
+      return false;
 
-   case EOpLessThan: 
+   case EOpLessThan:
       writeComparison ( "<", "lessThan", node, goit );
-      return false;               
+      return false;
 
    case EOpGreaterThan:
       writeComparison ( ">", "greaterThan", node, goit );
-      return false;               
+      return false;
 
-   case EOpLessThanEqual:    
+   case EOpLessThanEqual:
       writeComparison ( "<=", "lessThanEqual", node, goit );
-      return false;               
+      return false;
 
 
-   case EOpGreaterThanEqual: 
+   case EOpGreaterThanEqual:
       writeComparison ( ">=", "greaterThanEqual", node, goit );
-      return false;               
+      return false;
 
 
    case EOpVectorTimesScalar: op = "*"; infix = true; break;
@@ -1134,39 +1134,39 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
 	   // special case for swizzled matrix assignment
 	   if (node->getOp() == EOpAssign && node->getLeft() && node->getRight()) {
 		   TIntermBinary* lval = node->getLeft()->getAsBinaryNode();
-		   
+
 		   if (lval && lval->getOp() == EOpMatrixSwizzle) {
 			   static const char* vec_swizzles = "xyzw";
 			   TIntermTyped* rval = node->getRight();
 			   TIntermTyped* lexp = lval->getLeft();
-			   
+
 			   goit->visitConstant = TGlslOutputTraverser::traverseImmediateConstant;
 			   goit->generatingCode = false;
-			   
+
 			   lval->getRight()->traverse(goit);
-			   
+
 			   goit->visitConstant = TGlslOutputTraverser::traverseConstant;
 			   goit->generatingCode = true;
-			   
+
 			   std::vector<int> swizzles = goit->indexList;
 			   goit->indexList.clear();
-			   
+
 			   char temp_rval[128];
 			   unsigned n_swizzles = swizzles.size();
-			   
+
 			   if (n_swizzles > 1) {
 				   snprintf(temp_rval, 128, "xlat_swiztemp%d", goit->swizzleAssignTempCounter++);
-				   
+
 				   current->beginStatement();
 				   out << "vec" << n_swizzles << " " << temp_rval << " = ";
-				   rval->traverse(goit);			   
+				   rval->traverse(goit);
 				   current->endStatement();
 			   }
-			   
+
 			   for (unsigned i = 0; i != n_swizzles; ++i) {
 				   unsigned col = swizzles[i] / 4;
 				   unsigned row = swizzles[i] % 4;
-				   
+
 				   current->beginStatement();
 				   lexp->traverse(goit);
 				   out << "[" << row << "][" << col << "] = ";
@@ -1174,7 +1174,7 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
 					   out << temp_rval << "." << vec_swizzles[i];
 				   else
 					   rval->traverse(goit);
-				   
+
 				   current->endStatement();
 			   }
 
@@ -1197,7 +1197,7 @@ bool TGlslOutputTraverser::traverseBinary( bool preVisit, TIntermBinary *node, T
    else
    {
       if (assign)
-      {		  
+      {
          // Need to traverse the left child twice to allow for the assign and the op
          // This is OK, because we know it is an lvalue
          if (node->getLeft())
@@ -1261,7 +1261,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
       if (node->getTypePointer()->isVector())
       {
          zero[0] += node->getTypePointer()->getRowsCount();
-         op = TString("bvec") + zero; 
+         op = TString("bvec") + zero;
       }
       funcStyle = true;
       prefix = true;
@@ -1273,19 +1273,19 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
       if (node->getTypePointer()->isVector())
       {
          zero[0] += node->getTypePointer()->getRowsCount();
-         op = TString("vec") + zero; 
+         op = TString("vec") + zero;
       }
       funcStyle = true;
       prefix = true;
       break;
 
-   case EOpConvFloatToInt: 
+   case EOpConvFloatToInt:
    case EOpConvBoolToInt:
       op = "int";
       if (node->getTypePointer()->isVector())
       {
          zero[0] += node->getTypePointer()->getRowsCount();
-         op = TString("ivec") + zero; 
+         op = TString("ivec") + zero;
       }
       funcStyle = true;
       prefix = true;
@@ -1299,7 +1299,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
    case EOpAsin:           setupUnaryBuiltInFuncCall ( "asin", node, op, funcStyle, prefix, goit ); break;
    case EOpAcos:           setupUnaryBuiltInFuncCall ( "acos", node, op, funcStyle, prefix, goit ); break;
    case EOpAtan:           setupUnaryBuiltInFuncCall ( "atan", node, op, funcStyle, prefix, goit ); break;
-   
+
    case EOpExp:            setupUnaryBuiltInFuncCall ( "exp", node, op, funcStyle, prefix, goit ); break;
    case EOpLog:            setupUnaryBuiltInFuncCall ( "log", node, op, funcStyle, prefix, goit ); break;
    case EOpExp2:           setupUnaryBuiltInFuncCall ( "exp2", node, op, funcStyle, prefix, goit ); break;
@@ -1336,13 +1336,13 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
 	   funcStyle = true;
 	   prefix = true;
 	   break;
-   case EOpFclip:		   
+   case EOpFclip:
 	  current->addLibFunction(EOpFclip);
       op = "xll_clip_";
 	  node->getOperand()->getType().buildMangledName(op);
       funcStyle = true;
       prefix = true;
-      break;    
+      break;
 
 	case EOpRound:
 		current->addLibFunction(EOpRound);
@@ -1358,7 +1358,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
 	   funcStyle = true;
 	   prefix = true;
 	   break;
-		   
+
    case EOpAny:            op = "any";  funcStyle = true; prefix = true; break;
    case EOpAll:            op = "all";  funcStyle = true; prefix = true; break;
 
@@ -1369,7 +1369,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
 	  node->getOperand()->getType().buildMangledName(op);
       funcStyle = true;
       prefix = true;
-      break;    
+      break;
 
    case EOpTranspose:
       current->addLibFunction(EOpTranspose);
@@ -1387,13 +1387,13 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
       prefix = true;
       break;
 
-   case EOpLog10:        
+   case EOpLog10:
       current->addLibFunction(EOpLog10);
       op = "xll_log10_";
 	  node->getOperand()->getType().buildMangledName(op);
       funcStyle = true;
       prefix = true;
-      break;       
+      break;
 
    case EOpD3DCOLORtoUBYTE4:
       current->addLibFunction(EOpD3DCOLORtoUBYTE4);
@@ -1502,7 +1502,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
    GlslFunction *current = goit->current;
    std::stringstream& out = current->getActiveOutput();
    int argCount = (int) node->getNodes().size();
-   bool usePost120TextureLookups = UsePost120TextureLookups(goit->m_TargetVersion); 
+   bool usePost120TextureLookups = UsePost120TextureLookups(goit->m_TargetVersion);
 
    if (node->getOp() == EOpNull)
    {
@@ -1518,7 +1518,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       {
 		  goit->outputLineDirective (node->getLine());
          TNodeArray::iterator sit;
-         TNodeArray& nodes = node->getNodes(); 
+         TNodeArray& nodes = node->getNodes();
 		 for (sit = nodes.begin(); sit != nodes.end(); ++sit)
 		 {
 		   goit->outputLineDirective((*sit)->getLine());
@@ -1530,7 +1530,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       else
       {
          TNodeArray::iterator sit;
-         TNodeArray& nodes = node->getNodes(); 
+         TNodeArray& nodes = node->getNodes();
 		  for (sit = nodes.begin(); sit != nodes.end(); ++sit)
 		  {
 		    (*sit)->traverse(it);
@@ -1543,7 +1543,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       {
          GlslFunction *func = new GlslFunction( node->getPlainName().c_str(), node->getName().c_str(),
                                                 translateType(node->getTypePointer()), goit->m_UsePrecision?node->getPrecision():EbpUndefined,
-											   node->getSemantic().c_str(), node->getLine()); 
+											   node->getSemantic().c_str(), node->getLine());
          if (func->getReturnType() == EgstStruct)
          {
             GlslStruct *s = goit->createStructFromType( node->getTypePointer());
@@ -1553,7 +1553,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
          goit->current = func;
          goit->current->beginBlock( false);
          TNodeArray::iterator sit;
-         TNodeArray& nodes = node->getNodes(); 
+         TNodeArray& nodes = node->getNodes();
 		 for (sit = nodes.begin(); sit != nodes.end(); ++sit)
 		 {
 			 (*sit)->traverse(it);
@@ -1567,7 +1567,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       it->visitSymbol = traverseParameterSymbol;
       {
          TNodeArray::iterator sit;
-         TNodeArray& nodes = node->getNodes(); 
+         TNodeArray& nodes = node->getNodes();
 		 for (sit = nodes.begin(); sit != nodes.end(); ++sit)
            (*sit)->traverse(it);
       }
@@ -1616,7 +1616,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
    case EOpComma:
       {
          TNodeArray::iterator sit;
-         TNodeArray& nodes = node->getNodes(); 
+         TNodeArray& nodes = node->getNodes();
          for (sit = nodes.begin(); sit != nodes.end(); ++sit)
          {
             (*sit)->traverse(it);
@@ -1629,7 +1629,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
    case EOpFunctionCall:
       current->addCalledFunction(node->getName().c_str());
       writeFuncCall( node->getPlainName(), node, goit);
-      return false; 
+      return false;
 
    case EOpLessThan:         writeFuncCall( "lessThan", node, goit); return false;
    case EOpGreaterThan:      writeFuncCall( "greaterThan", node, goit); return false;
@@ -1664,7 +1664,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       {
          //This should always have two arguments
          assert(node->getNodes().size() == 2);
-         current->beginStatement();                     
+         current->beginStatement();
 
          out << '(';
          node->getNodes()[0]->traverse(goit);
@@ -1686,29 +1686,29 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       }
       return false;
 
-   case EOpTex1DProj:     
-      writeTex( "texture1DProj", node, goit); 
+   case EOpTex1DProj:
+      writeTex( "texture1DProj", node, goit);
       return false;
 
    case EOpTex1DLod:
       current->addLibFunction(EOpTex1DLod);
-      writeTex( "xll_tex1Dlod", node, goit); 
+      writeTex( "xll_tex1Dlod", node, goit);
       return false;
 
    case EOpTex1DBias:
       current->addLibFunction(EOpTex1DBias);
-      writeTex( "xll_tex1Dbias", node, goit); 
+      writeTex( "xll_tex1Dbias", node, goit);
       return false;
 
-   case EOpTex1DGrad:     
+   case EOpTex1DGrad:
       current->addLibFunction(EOpTex1DGrad);
-      writeTex( "xll_tex1Dgrad", node, goit); 
+      writeTex( "xll_tex1Dgrad", node, goit);
       return false;
 
    case EOpTex2D:
       if (argCount == 2)
-      {  
-          if(usePost120TextureLookups) {       
+      {
+          if(usePost120TextureLookups) {
               writeTex( "texture", node, goit);
           } else {
               writeTex( "texture2D", node, goit);
@@ -1721,27 +1721,27 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       }
       return false;
 
-   case EOpTex2DProj:     
-      if(usePost120TextureLookups) {       
+   case EOpTex2DProj:
+      if(usePost120TextureLookups) {
           writeTex( "textureProj", node, goit);
       } else {
           writeTex( "texture2DProj", node, goit);
       }
       return false;
 
-   case EOpTex2DLod:      
+   case EOpTex2DLod:
       current->addLibFunction(EOpTex2DLod);
-      writeTex( "xll_tex2Dlod", node, goit); 
+      writeTex( "xll_tex2Dlod", node, goit);
       return false;
 
-   case EOpTex2DBias:  
+   case EOpTex2DBias:
       current->addLibFunction(EOpTex2DBias);
-      writeTex( "xll_tex2Dbias", node, goit); 
+      writeTex( "xll_tex2Dbias", node, goit);
       return false;
 
-   case EOpTex2DGrad:  
+   case EOpTex2DGrad:
       current->addLibFunction(EOpTex2DGrad);
-      writeTex( "xll_tex2Dgrad", node, goit); 
+      writeTex( "xll_tex2Dgrad", node, goit);
       return false;
 
    case EOpTex3D:
@@ -1756,27 +1756,27 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       else
       {
          current->addLibFunction(EOpTex3DGrad);
-         writeTex( "xll_tex3Dgrad", node, goit);            
+         writeTex( "xll_tex3Dgrad", node, goit);
       }
       return false;
 
-   case EOpTex3DProj:    
-      writeTex( "texture3DProj", node, goit); 
+   case EOpTex3DProj:
+      writeTex( "texture3DProj", node, goit);
       return false;
 
-   case EOpTex3DLod:     
+   case EOpTex3DLod:
       current->addLibFunction(EOpTex3DLod);
-      writeTex( "xll_tex3Dlod", node, goit); 
+      writeTex( "xll_tex3Dlod", node, goit);
       return false;
 
-   case EOpTex3DBias:     
+   case EOpTex3DBias:
       current->addLibFunction(EOpTex3DBias);
-      writeTex( "xll_tex3Dbias", node, goit); 
+      writeTex( "xll_tex3Dbias", node, goit);
       return false;
 
-   case EOpTex3DGrad:    
+   case EOpTex3DGrad:
       current->addLibFunction(EOpTex3DGrad);
-      writeTex( "xll_tex3Dgrad", node, goit); 
+      writeTex( "xll_tex3Dgrad", node, goit);
       return false;
 
    case EOpTexCube:
@@ -1793,34 +1793,34 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
          writeTex( "xll_texCUBEgrad", node, goit);
       }
       return false;
-   case EOpTexCubeProj:   
-      writeTex( "textureCubeProj", node, goit); 
+   case EOpTexCubeProj:
+      writeTex( "textureCubeProj", node, goit);
       return false;
 
-   case EOpTexCubeLod:    
-      current->addLibFunction(EOpTexCubeLod); 
-      writeTex( "xll_texCUBElod", node, goit); 
+   case EOpTexCubeLod:
+      current->addLibFunction(EOpTexCubeLod);
+      writeTex( "xll_texCUBElod", node, goit);
       return false;
 
-   case EOpTexCubeBias:   
-      current->addLibFunction(EOpTexCubeBias); 
-      writeTex( "xll_texCUBEbias", node, goit); 
+   case EOpTexCubeBias:
+      current->addLibFunction(EOpTexCubeBias);
+      writeTex( "xll_texCUBEbias", node, goit);
       return false;
 
-   case EOpTexCubeGrad:   
+   case EOpTexCubeGrad:
       current->addLibFunction(EOpTexCubeGrad);
-      writeTex( "xll_texCUBEgrad", node, goit); 
+      writeTex( "xll_texCUBEgrad", node, goit);
       return false;
 
    case EOpTexRect:
 	   writeTex( "texture2DRect", node, goit);
 	   return false;
-	   
+
    case EOpTexRectProj:
 	   writeTex( "texture2DRectProj", node, goit);
 	   return false;
-		   
-   case EOpShadow2D:		   
+
+   case EOpShadow2D:
 		current->addLibFunction(EOpShadow2D);
 		writeTex("xll_shadow2D", node, goit);
 		return false;
@@ -1840,7 +1840,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
 		current->addLibFunction(EOpTex2DArrayBias);
 		writeTex("xll_tex2DArrayBias", node, goit);
 		return false;
-		   
+
    case EOpModf:
       current->addLibFunction(EOpModf);
       writeFuncCall( "xll_modf", node, goit, false, true);
@@ -1851,7 +1851,7 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
       writeFuncCall( "xll_ldexp", node, goit, false, true);
       break;
 
-   case EOpSinCos:        
+   case EOpSinCos:
       current->addLibFunction(EOpSinCos);
       writeFuncCall ( "xll_sincos", node, goit, false, true);
       break;

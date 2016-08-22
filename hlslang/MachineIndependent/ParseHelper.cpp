@@ -80,9 +80,9 @@ namespace {
 				return true;
 		}
 	}
-	
+
 	bool isBranchConstant(TIntermNode* node);
-	
+
 	bool isBranchConstant(TNodeArray& seq)
 	{
 		TNodeArray::iterator it = seq.begin(), end = seq.end();
@@ -92,12 +92,12 @@ namespace {
 		}
 		return true;
 	}
-	
+
 	bool isBranchConstant(TIntermNode* node)
 	{
 		Nodes n;
 		if ((n.a = node->getAsAggregate()))
-			return isConst(n.a->getOp()) && isBranchConstant(n.a->getNodes());			
+			return isConst(n.a->getOp()) && isBranchConstant(n.a->getNodes());
 		else if ((n.b = node->getAsBinaryNode()))
 			return isBranchConstant(n.b->getLeft()) && isBranchConstant(n.b->getRight());
 		else if ((n.c = node->getAsConstant()))
@@ -367,23 +367,23 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 		error(line, "illegal vector field selection", compString.c_str(), "");
 		return false;
 	}
-	
+
 	enum
 	{
 		exyzw,
 		ergba,
 		estpq,
 	} fieldSet[4];
-	
+
 	for (int i = 0; i < fields.num; ++i)
 	{
 		switch (compString[i])
 		{
-		case 'x': 
+		case 'x':
 			fields.offsets[i] = 0;
 			fieldSet[i] = exyzw;
 			break;
-		case 'r': 
+		case 'r':
 			fields.offsets[i] = 0;
 			fieldSet[i] = ergba;
 			break;
@@ -391,11 +391,11 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			fields.offsets[i] = 0;
 			fieldSet[i] = estpq;
 			break;
-		case 'y': 
+		case 'y':
 			fields.offsets[i] = 1;
 			fieldSet[i] = exyzw;
 			break;
-		case 'g': 
+		case 'g':
 			fields.offsets[i] = 1;
 			fieldSet[i] = ergba;
 			break;
@@ -403,11 +403,11 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			fields.offsets[i] = 1;
 			fieldSet[i] = estpq;
 			break;
-		case 'z': 
+		case 'z':
 			fields.offsets[i] = 2;
 			fieldSet[i] = exyzw;
 			break;
-		case 'b': 
+		case 'b':
 			fields.offsets[i] = 2;
 			fieldSet[i] = ergba;
 			break;
@@ -415,12 +415,12 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			fields.offsets[i] = 2;
 			fieldSet[i] = estpq;
 			break;
-			
-		case 'w': 
+
+		case 'w':
 			fields.offsets[i] = 3;
 			fieldSet[i] = exyzw;
 			break;
-		case 'a': 
+		case 'a':
 			fields.offsets[i] = 3;
 			fieldSet[i] = ergba;
 			break;
@@ -433,7 +433,7 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			return false;
 		}
 	}
-	
+
 	for (int i = 0; i < fields.num; ++i)
 	{
 		if (fields.offsets[i] >= vecSize)
@@ -441,7 +441,7 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			error(line, "vector field selection out of range",  compString.c_str(), "");
 			return false;
 		}
-		
+
 		if (i > 0)
 		{
 			if (fieldSet[i] != fieldSet[i-1])
@@ -451,7 +451,7 @@ bool TParseContext::parseVectorFields(const TString& compString, int vecSize, TV
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -463,16 +463,16 @@ bool TParseContext::parseMatrixFields(const TString& compString, int matCols, in
 {
 	fields.num = 1;
 	fields.offsets[0] = 0;
-	
+
 	if (compString.size() < 3  || compString[0] != '_')
 	{
 		error(line, "illegal matrix field selection", compString.c_str(), "");
 		return false;
 	}
-	
+
 	if (compString[1] == 'm')
 	{
-		//The selection is 0 based with the syntax _m## 
+		//The selection is 0 based with the syntax _m##
 		if ( (compString.size() % 4) != 0 || compString.size() > 16)
 		{
 			error(line, "illegal matrix field selection", compString.c_str(), "");
@@ -534,7 +534,7 @@ bool TParseContext::parseMatrixFields(const TString& compString, int matCols, in
 		}
 		fields.num = static_cast<int>(compString.size())/3;
 	}
-	
+
 	return true;
 }
 
@@ -552,7 +552,7 @@ void TParseContext::recover()
 //
 // Used by flex/bison to output all syntax and parsing errors.
 //
-void C_DECL TParseContext::error(TSourceLoc nLine, const char *szReason, const char *szToken, 
+void C_DECL TParseContext::error(TSourceLoc nLine, const char *szReason, const char *szToken,
                                  const char *szExtraInfoFormat, ...)
 {
    char szExtraInfo[400];
@@ -586,7 +586,7 @@ void TParseContext::assignError(const TSourceLoc& line, const char* op, TString 
 //
 void TParseContext::unaryOpError(const TSourceLoc& line, const char* op, TString operand)
 {
-   error(line, " wrong operand type", op, 
+   error(line, " wrong operand type", op,
          "no operation '%s' exists that takes an operand of type %s (or there is no acceptable conversion)",
          op, operand.c_str());
 }
@@ -596,9 +596,9 @@ void TParseContext::unaryOpError(const TSourceLoc& line, const char* op, TString
 //
 void TParseContext::binaryOpError(const TSourceLoc& line, const char* op, TString left, TString right)
 {
-   error(line, " wrong operand types ", op, 
+   error(line, " wrong operand types ", op,
          "no operation '%s' exists that takes a left-hand operand of type '%s' and "
-         "a right operand of type '%s' (or there is no acceptable conversion)", 
+         "a right operand of type '%s' (or there is no acceptable conversion)",
          op, left.c_str(), right.c_str());
 }
 
@@ -612,11 +612,11 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 {
 	TIntermSymbol* symNode = node->getAsSymbolNode();
 	TIntermBinary* binaryNode = node->getAsBinaryNode();
-	
+
 	if (binaryNode)
 	{
 		bool errorReturn;
-		
+
 		switch (binaryNode->getOp())
 		{
 			case EOpIndexDirect:
@@ -628,19 +628,19 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 				if (!errorReturn)
 				{
 					int offset[4] = {0,0,0,0};
-					
+
 					TIntermTyped* rightNode = binaryNode->getRight();
 					TIntermAggregate *aggrNode = rightNode->getAsAggregate();
-					
-					for (TNodeArray::iterator p = aggrNode->getNodes().begin(); 
+
+					for (TNodeArray::iterator p = aggrNode->getNodes().begin();
 						 p != aggrNode->getNodes().end(); p++)
 					{
 						int value = (*p)->getAsTyped()->getAsConstant()->toInt();
-						offset[value]++;     
+						offset[value]++;
 						if (offset[value] > 1)
 						{
 							error(line, " l-value of swizzle cannot have duplicate components", op, "", "");
-							
+
 							return true;
 						}
 					}
@@ -650,38 +650,38 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 				if (!errorReturn)
 				{
 					int offset[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-					
+
 					TIntermTyped* rightNode = binaryNode->getRight();
 					TIntermAggregate *aggrNode = rightNode->getAsAggregate();
-					
-					for (TNodeArray::iterator p = aggrNode->getNodes().begin(); 
+
+					for (TNodeArray::iterator p = aggrNode->getNodes().begin();
 						 p != aggrNode->getNodes().end(); p++)
 					{
 						int value = (*p)->getAsTyped()->getAsConstant()->toInt();
-						offset[value]++;     
+						offset[value]++;
 						if (offset[value] > 1)
 						{
 							error(line, " l-value of swizzle cannot have duplicate components", op, "", "");
-							
+
 							return true;
 						}
 					}
 				}
-				
+
 				return errorReturn;
-			default: 
+			default:
 				break;
 		}
 		error(line, " l-value required", op, "", "");
-		
+
 		return true;
 	}
-	
-	
+
+
 	const char* symbol = 0;
 	if (symNode != 0)
 		symbol = symNode->getSymbol().c_str();
-	
+
 	const char* message = 0;
 	switch (node->getQualifier())
 	{
@@ -692,7 +692,7 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 			node->getTypePointer()->changeQualifier(EvqMutableUniform);
 			break;
 		default:
-			
+
 			//
 			// Type that can't be written to?
 			//
@@ -713,25 +713,25 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 				case EbtVoid:
 					message = "can't modify void";
 					break;
-				default: 
+				default:
 					break;
 			}
 	}
-	
+
 	if (message == 0 && binaryNode == 0 && symNode == 0)
 	{
 		error(line, " l-value required", op, "", "");
-		
+
 		return true;
 	}
-	
-	
+
+
 	//
 	// Everything else is okay, no error.
 	//
 	if (message == 0)
 		return false;
-	
+
 	//
 	// If we get here, we have an error and a message.
 	//
@@ -739,7 +739,7 @@ bool TParseContext::lValueErrorCheck(const TSourceLoc& line, const char* op, TIn
 		error(line, " l-value required", op, "\"%s\" (%s)", symbol, message);
 	else
 		error(line, " l-value required", op, "(%s)", message);
-	
+
 	return true;
 }
 
@@ -854,7 +854,7 @@ bool TParseContext::constructorErrorCheck(const TSourceLoc& line, TIntermNode* n
    case EOpConstructMat4x4:
       constructingMatrix = true;
       break;
-   default: 
+   default:
       break;
    }
 
@@ -882,7 +882,7 @@ bool TParseContext::constructorErrorCheck(const TSourceLoc& line, TIntermNode* n
       if (function[i].type->isArray())
          arrayArg = true;
    }
-	
+
 	if (constructingMatrix)
 		constType = false;
 
@@ -969,7 +969,7 @@ bool TParseContext::boolErrorCheck(const TSourceLoc& line, const TIntermTyped* t
 {
    // In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
    // float, or int.
-   if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) || 
+   if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) ||
         type->isArray() || type->isMatrix() || type->isVector())
    {
       error(line, "boolean expression expected", "", "");
@@ -984,13 +984,13 @@ bool TParseContext::boolOrVectorErrorCheck(const TSourceLoc& line, const TInterm
 {
 	// In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
 	// float, or int.
-	if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) || 
+	if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) ||
         type->isArray() || type->isMatrix())
 	{
 		error(line, "boolean or vector expression expected", "", "");
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -1002,7 +1002,7 @@ bool TParseContext::boolOrVectorErrorCheck(const TSourceLoc& line, const TInterm
 bool TParseContext::boolErrorCheck(const TSourceLoc& line, const TPublicType& pType)
 {
    // In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
-   // float, or int.   
+   // float, or int.
    if ((pType.type != EbtBool && pType.type != EbtInt && pType.type != EbtFloat) ||
         pType.array || pType.matrix || (pType.matcols > 1) || (pType.matrows > 1))
    {
@@ -1051,7 +1051,7 @@ bool TParseContext::structQualifierErrorCheck(const TSourceLoc& line, const TPub
 
 bool TParseContext::parameterSamplerErrorCheck(const TSourceLoc& line, TQualifier qualifier, const TType& type)
 {
-   if ((qualifier == EvqOut || qualifier == EvqInOut) && 
+   if ((qualifier == EvqOut || qualifier == EvqInOut) &&
        type.getBasicType() != EbtStruct && IsSampler(type.getBasicType()))
    {
       error(line, "samplers cannot be output parameters", type.getBasicString(), "");
@@ -1166,7 +1166,7 @@ bool TParseContext::arrayTypeErrorCheck(const TSourceLoc& line, TPublicType type
 }
 
 //
-// Do all the semantic checking for declaring an array, with and 
+// Do all the semantic checking for declaring an array, with and
 // without a size, and make the right changes to the symbol table.
 //
 // size == 0 means no specified size.
@@ -1185,11 +1185,11 @@ static inline void AdjustTypeQualifier(TPublicType& type)
 	if (type.qualifier == EvqGlobal)
 		type.qualifier = EvqUniform; // according to hlsl, non static globals are uniforms
 	else if (type.qualifier == EvqStatic)
-		type.qualifier = EvqGlobal;	
+		type.qualifier = EvqGlobal;
 }
 
 //
-// Do all the semantic checking for declaring an array, with and 
+// Do all the semantic checking for declaring an array, with and
 // without a size, and make the right changes to the symbol table.
 //
 // size == 0 means no specified size.
@@ -1202,10 +1202,10 @@ bool TParseContext::arrayErrorCheck(const TSourceLoc& line, TString& identifier,
    // Don't check for reserved word use until after we know it's not in the symbol table,
    // because reserved arrays can be redeclared.
    //
-	
+
 	AdjustTypeQualifier (type);
 
-   bool builtIn = false; 
+   bool builtIn = false;
    bool sameScope = false;
    TSymbol* symbol = symbolTable.find(identifier, &builtIn, &sameScope);
    if (symbol == 0 || !sameScope)
@@ -1265,7 +1265,7 @@ bool TParseContext::arrayErrorCheck(const TSourceLoc& line, TString& identifier,
 
       if (type.arraySize)
          variable->getType().setArraySize(type.arraySize);
-   } 
+   }
 
    if (voidErrorCheck(line, identifier, type))
       return true;
@@ -1287,7 +1287,7 @@ bool TParseContext::arraySetMaxSize(TIntermSymbol *node, TType* type, int size, 
    type->setArrayInformationType(variable->getArrayInformationType());
    variable->updateArrayInformationType(type);
 
-   // we dont want to update the maxArraySize when this flag is not set, we just want to include this 
+   // we dont want to update the maxArraySize when this flag is not set, we just want to include this
    // node type in the chain of node types so that its updated when a higher maxArraySize comes in.
    if (!updateFlag)
       return false;
@@ -1435,7 +1435,7 @@ const TFunction* TParseContext::findFunction(const TSourceLoc& line, TFunction* 
 // Initializers show up in several places in the grammar.  Have one set of
 // code to handle them here.
 //
-bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, TPublicType& pType, 
+bool TParseContext::executeInitializer(TSourceLoc line, TString& identifier, TPublicType& pType,
                                        TIntermTyped*& initializer, TIntermSymbol*& intermNode, TVariable* variable)
 {
 
@@ -1503,27 +1503,27 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 		{
 			error(line, "redefinition", variable->getName().c_str(), "");
 			return true;
-			// don't delete variable, it's used by error recovery, and the pool 
+			// don't delete variable, it's used by error recovery, and the pool
 			// pop will take care of the memory
 		}
-	} 
+	}
 	//check to see if we have a blind aggregate
 	TIntermAggregate *agg = initializer->getAsAggregate();
 	if (agg && agg->getOp() == EOpNull && !IsSampler(type.getBasicType()))
-	{	
+	{
 		if (type.isArray() && type.getArraySize() == 0)
 			variable->getType().setArraySize(agg->getNodes().size());
-		
+
 		if (type.getStruct())
 			variable->getType().setStruct(type.getStruct());
-		
+
 		initializer = addConstructor(agg, &variable->getType(), getConstructorOp(variable->getType()), 0, agg->getLine());
 		if ( initializer == NULL )
 			return true;
-		
+
 		type = variable->getType();
 	}
-	
+
 	TIntermTyped* converted = ir_add_conversion(EOpAssign, type, initializer, infoSink);
 	if (converted)
 		initializer = converted;
@@ -1537,8 +1537,8 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 		error(line, " cannot initialize this type of qualifier ", variable->getType().getQualifierString(), "");
 		return true;
 	}
-	
-	TQualifier initializerQualifier = initializer->getType().getQualifier();	
+
+	TQualifier initializerQualifier = initializer->getType().getQualifier();
 	bool isConst = (initializerQualifier == EvqConst);
 	// GLSL 1.20+ allows more things in constant initializers;
 	// not so much for earlier GLSL versions.
@@ -1547,7 +1547,7 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 		/*
 		// isBranchConstant doesn't actually work yet, e.g. it sees "-foobar" and assumes it's
 		// constant no matter what foobar actually is. Disable for now.
-		 
+
 		isConst |= isBranchConstant(initializer);
 		if (isConst)
 		{
@@ -1556,7 +1556,7 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 		}
 		 */
 	}
-	
+
 	// Are we trying to initialize a constant?
 	if (qualifier == EvqConst)
 	{
@@ -1565,7 +1565,7 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 		{
 			const TBasicType basicType = type.getBasicType();
 			const TBasicType initializerType = initializer->getType().getBasicType();
-			
+
 			// allow type promotion (eg: const float SCALE = 2;)
 			if ((basicType == EbtFloat) && (initializerType == EbtInt) && (type.getObjectSize() == initializer->getType().getObjectSize()))
 			{
@@ -1575,10 +1575,10 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 			{
 				error(line, " non-matching types for const initializer", variable->getType().getQualifierString(), "");
 				variable->getType().changeQualifier(EvqTemporary);
-				return true;				
+				return true;
 			}
 		}
-		
+
 		// If we're trying to initialize something marked as const with a non-const initializer,
 		// change its type to temporary instead
 		if (initializerQualifier != EvqConst)
@@ -1593,18 +1593,18 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 			return true;
 		}
 	}
-	
+
 
 	// constant initializer value, if present
 	if (initializer->getAsConstant())
 	{
 		variable->constValue = initializer->getAsConstant();
 	}
-	
+
 //ACS: this was stopping non-type-explicit constant initializers from working (was that by design?)
-//  e.g. it allowed this: 
+//  e.g. it allowed this:
 //      uniform float3 my_constants = float3(1, 2, 3);
-//  but not this, which afaik is legal hlsl: 
+//  but not this, which afaik is legal hlsl:
 //      uniform float3 my_constants = { 1, 2, 3 };
 //
 // 	if (qualifier == EvqUniform)
@@ -1648,7 +1648,7 @@ static bool TransposeMatrixConstructorArgs (const TType* type, TNodeArray& args)
 
 
 // This function is used to test for the correctness of the parameters passed to various constructor functions
-// and also convert them to the right datatype if it is allowed and required. 
+// and also convert them to the right datatype if it is allowed and required.
 //
 // Returns 0 for an error or the constructed node (aggregate or typed) for no error.
 //
@@ -1656,17 +1656,17 @@ TIntermTyped* TParseContext::addConstructor(TIntermNode* node, const TType* type
 {
 	if (node == 0)
 		return 0;
-	
+
 	TTypeList& struct_members = *type->getStruct();
 	TIntermAggregate* aggregate = node->getAsAggregate();
 	if (aggregate && aggregate->getOp() == EOpNull) {
-		
+
 		if (type->isArray())
 			return constructArray(aggregate, type, op, line);
-		
+
 		TType element_type = *type;
 		element_type.clearArrayness();
-		
+
 		TNodeArray &params = aggregate->getNodes();
 		unsigned n_params = params.size();
 		for (unsigned i = 0; i != n_params; ++i) {
@@ -1677,19 +1677,19 @@ TIntermTyped* TParseContext::addConstructor(TIntermNode* node, const TType* type
 				p = constructStruct(p, struct_members[i].type, i+1, node->getLine(), true);
 			else
 				p = constructBuiltIn(type, op, p, node->getLine(), true);
-			
+
 			if (p)
 				params[i] = p;
 		}
-		
+
 		TIntermTyped* constructor = ir_set_aggregate_op(aggregate, op, line);
 		constructor->setType(*type);
 		if (!TransposeMatrixConstructorArgs (type, params))
 			constructor = ir_add_unary_math (EOpTranspose, constructor, line, *this);
-		
+
 		return constructor;
 	}
-	
+
 	if (type->isArray())
 		return constructBuiltIn(type, op, node, node->getLine(), true);
 	else if (op == EOpConstructStruct)
@@ -1789,7 +1789,7 @@ TIntermTyped* TParseContext::constructBuiltInAllowUpwardVectorPromote(
     TIntermTyped* tNode = node->getAsTyped();
 
     // Only allow scalar -> vector promotion
-    
+
     if ( !tNode->isVector() )
     {
         tNode = constructBuiltIn(type, op, tNode, line, subset);
@@ -1798,7 +1798,7 @@ TIntermTyped* TParseContext::constructBuiltInAllowUpwardVectorPromote(
     {
         tNode = nullptr;
     }
-    
+
 #if 0
     // Handle upward promotion of vectors:
     //   HLSL allows upward promotion of vectors as a special case to function calls.  For example,
@@ -1822,7 +1822,7 @@ TIntermTyped* TParseContext::constructBuiltInAllowUpwardVectorPromote(
             cUnion->setValue(0.0f);
 
             // Add the constant to the aggregrate node
-            tempAgg = ir_grow_aggregate( tempAgg, cUnion, tNode->getLine()); 
+            tempAgg = ir_grow_aggregate( tempAgg, cUnion, tNode->getLine());
         }
 
         // Construct the built-in with padding
@@ -1858,7 +1858,7 @@ TIntermNode* TParseContext::promoteFunctionArguments( TIntermNode *node, const T
       assert( (int)seq.size() == func->getParamCount());
 
       for ( TNodeArray::iterator it = seq.begin(); it != seq.end(); it++, paramNum++)
-      { 
+      {
          tNode = (*it)->getAsTyped();
 
          if ( tNode != 0 && tNode->getType() != *(*func)[paramNum].type)
@@ -1906,7 +1906,7 @@ TIntermTyped* TParseContext::addAssign(TOperator op, TIntermTyped* left, TInterm
 
 // Function for constructor implementation. Calls ir_add_unary_math with appropriate EOp value
 // for the parameter to the constructor (passed to this function). Essentially, it converts
-// the parameter types correctly. If a constructor expects an int (like ivec2) and is passed a 
+// the parameter types correctly. If a constructor expects an int (like ivec2) and is passed a
 // float, then float is converted to int.
 //
 // Returns 0 for an error or the constructed node.
@@ -1915,7 +1915,7 @@ TIntermTyped* TParseContext::constructBuiltIn(const TType* type, TOperator op, T
 {
 	TIntermTyped* newNode;
 	TOperator basicOp;
-	
+
 	// Check for no-op constructions such as casting to the same builtin type.
 	if (node->getAsTyped() && *node->getAsTyped()->getTypePointer() == *type) {
 		return node->getAsTyped();
@@ -1987,7 +1987,7 @@ TIntermTyped* TParseContext::constructBuiltIn(const TType* type, TOperator op, T
       if (newNode->getColsCount() < type->getColsCount() ||
           newNode->getRowsCount() < type->getRowsCount())
           return 0;
-	   
+
 	   if (targetVersion < ETargetGLSL_120)
 	   {
 		   const int c = type->getColsCount();
@@ -2048,10 +2048,10 @@ TIntermTyped* TParseContext::constructStruct(TIntermNode* node, TType* type, int
 		result = ir_promote_constant(type->getBasicType(), node->getAsConstant(), infoSink);
 	else if (node->getAsTyped())
 		result = ir_add_conversion(EOpAssign, *type, node->getAsTyped(), infoSink);
-		
+
 	if (result)
 		return result;
-	
+
 	error(line, "", "constructor", "cannot convert parameter %d from '%s' to '%s'", paramCount, node->getAsTyped()->getType().getBasicString(), type->getBasicString());
 	recover();
 
@@ -2087,10 +2087,10 @@ TIntermTyped* TParseContext::constructArray(TIntermAggregate* aggNode, const TTy
       recover();
       return 0;
    }
-	
+
 	aggNode->setType(*type);
 	aggNode->setOperator(EOpConstructArray);
-	
+
 	return aggNode;
 
   /* sit = seq.begin();
@@ -2117,7 +2117,7 @@ TIntermTyped* TParseContext::constructArray(TIntermAggregate* aggNode, const TTy
       {
          error ( line, "", "constructor", "can not handle initializers that span array element boundaries");
          recover();
-         return 0;           
+         return 0;
       }
       newAgg = ir_grow_aggregate( newAgg, addConstructor( tempAgg, &elementType, op, 0, line), line);
    }*/
@@ -2241,4 +2241,3 @@ bool FreeParseContextIndex()
 
    return OS_FreeTLSIndex(tlsiIndex);
 }
-
