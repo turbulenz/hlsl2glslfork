@@ -119,6 +119,9 @@ static void writeConstantConstructor (std::stringstream& out, EGlslSymbolType t,
 				case EbtInt:
 					out << c->toInt(v);
 					break;
+				case EbtUInt:
+					out << c->toInt(v) << "u";
+					break;
 				case EbtFloat:
 					print_float(out, c->toFloat(v));
 					break;
@@ -667,7 +670,6 @@ void TGlslOutputTraverser::traverseSymbol(TIntermSymbol *node, TIntermTraverser 
 				states = createStateList(node->getInfo()->getStates());
 			}
 
-
 			GlslSymbol * sym = new GlslSymbol(
 				node->getSymbol().c_str(),
 				semantic,
@@ -772,6 +774,7 @@ void TGlslOutputTraverser::traverseImmediateConstant( TIntermConstant *c, TInter
       goit->indexList.push_back(c->toBool() ? 1 : 0);
       break;
    case EbtInt:
+   case EbtUInt:
       goit->indexList.push_back(c->toInt());
       break;
    case EbtFloat:
@@ -1256,6 +1259,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
    case EOpPreDecrement:   op = "--"; funcStyle = false; prefix = true; break;
 
    case EOpConvIntToBool:
+   case EOpConvUIntToBool:
    case EOpConvFloatToBool:
       op = "bool";
       if (node->getTypePointer()->isVector())
@@ -1269,6 +1273,7 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
 
    case EOpConvBoolToFloat:
    case EOpConvIntToFloat:
+   case EOpConvUIntToFloat:
       op = "float";
       if (node->getTypePointer()->isVector())
       {
@@ -1281,11 +1286,25 @@ bool TGlslOutputTraverser::traverseUnary( bool preVisit, TIntermUnary *node, TIn
 
    case EOpConvFloatToInt:
    case EOpConvBoolToInt:
+   case EOpConvUIntToInt:
       op = "int";
       if (node->getTypePointer()->isVector())
       {
          zero[0] += node->getTypePointer()->getRowsCount();
          op = TString("ivec") + zero;
+      }
+      funcStyle = true;
+      prefix = true;
+      break;
+
+   case EOpConvFloatToUInt:
+   case EOpConvBoolToUInt:
+   case EOpConvIntToUInt:
+      op = "uint";
+      if (node->getTypePointer()->isVector())
+      {
+         zero[0] += node->getTypePointer()->getRowsCount();
+         op = TString("uvec") + zero;
       }
       funcStyle = true;
       prefix = true;
@@ -1586,6 +1605,10 @@ bool TGlslOutputTraverser::traverseAggregate( bool preVisit, TIntermAggregate *n
    case EOpConstructIVec2: writeFuncCall( "ivec2", node, goit); return false;
    case EOpConstructIVec3: writeFuncCall( "ivec3", node, goit); return false;
    case EOpConstructIVec4: writeFuncCall( "ivec4", node, goit); return false;
+   case EOpConstructUInt:  writeFuncCall( "uint", node, goit); return false;
+   case EOpConstructUVec2: writeFuncCall( "uvec2", node, goit); return false;
+   case EOpConstructUVec3: writeFuncCall( "uvec3", node, goit); return false;
+   case EOpConstructUVec4: writeFuncCall( "uvec4", node, goit); return false;
 
    case EOpConstructMat2x2:  writeFuncCall( "mat2",   node, goit); return false;
    case EOpConstructMat2x3:  writeFuncCall( "mat2x3", node, goit); return false;

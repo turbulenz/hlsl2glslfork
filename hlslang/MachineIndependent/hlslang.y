@@ -9,16 +9,16 @@
 /* Based on:
 ANSI C Yacc grammar
 
-In 1985, Jeff Lee published his Yacc grammar (which is accompanied by a 
-matching Lex specification) for the April 30, 1985 draft version of the 
+In 1985, Jeff Lee published his Yacc grammar (which is accompanied by a
+matching Lex specification) for the April 30, 1985 draft version of the
 ANSI C standard.  Tom Stockfisch reposted it to net.sources in 1987; that
 original, as mentioned in the answer to question 17.25 of the comp.lang.c
 FAQ, can be ftp'ed from ftp.uu.net, file usenet/net.sources/ansi.c.grammar.Z.
- 
-I intend to keep this version as close to the current C Standard grammar as 
-possible; please let me know if you discover discrepancies. 
 
-Jutta Degener, 1995 
+I intend to keep this version as close to the current C Standard grammar as
+possible; please let me know if you discover discrepancies.
+
+Jutta Degener, 1995
 */
 
 #include "SymbolTable.h"
@@ -99,9 +99,9 @@ extern void yyerror(TParseContext&, const char*);
 %pure-parser
 
 %expect 1 /* One shift reduce conflict because of if | else */
-%token <lex> CONST_QUAL STATIC_QUAL BOOL_TYPE FLOAT_TYPE INT_TYPE STRING_TYPE FIXED_TYPE HALF_TYPE
+%token <lex> CONST_QUAL STATIC_QUAL BOOL_TYPE FLOAT_TYPE UINT_TYPE INT_TYPE STRING_TYPE FIXED_TYPE HALF_TYPE
 %token <lex> BREAK CONTINUE DO ELSE FOR IF DISCARD RETURN
-%token <lex> BVEC2 BVEC3 BVEC4 IVEC2 IVEC3 IVEC4 VEC2 VEC3 VEC4 HVEC2 HVEC3 HVEC4 FVEC2 FVEC3 FVEC4
+%token <lex> BVEC2 BVEC3 BVEC4 IVEC2 IVEC3 IVEC4 UVEC2 UVEC3 UVEC4 VEC2 VEC3 VEC4 HVEC2 HVEC3 HVEC4 FVEC2 FVEC3 FVEC4
 %token <lex> MATRIX2x2 MATRIX2x3 MATRIX2x4 MATRIX3x2 MATRIX3x3 MATRIX3x4 MATRIX4x2 MATRIX4x3 MATRIX4x4
 %token <lex> HMATRIX2x2 HMATRIX2x3 HMATRIX2x4 HMATRIX3x2 HMATRIX3x3 HMATRIX3x4 HMATRIX4x2 HMATRIX4x3 HMATRIX4x4
 %token <lex> FMATRIX2x2 FMATRIX2x3 FMATRIX2x4 FMATRIX3x2 FMATRIX3x3 FMATRIX3x4 FMATRIX4x2 FMATRIX4x3 FMATRIX4x4
@@ -111,7 +111,7 @@ extern void yyerror(TParseContext&, const char*);
 %token <lex> SAMPLER2D_HALF SAMPLER2D_FLOAT SAMPLERCUBE_HALF SAMPLERCUBE_FLOAT
 %token <lex> SAMPLERGENERIC VECTOR MATRIX REGISTER TEXTURE SAMPLERSTATE
 
-%token <lex> IDENTIFIER TYPE_NAME FLOATCONSTANT INTCONSTANT BOOLCONSTANT STRINGCONSTANT
+%token <lex> IDENTIFIER TYPE_NAME FLOATCONSTANT INTCONSTANT UINTCONSTANT BOOLCONSTANT STRINGCONSTANT
 %token <lex> FIELD_SELECTION
 %token <lex> LEFT_OP RIGHT_OP
 %token <lex> INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
@@ -130,7 +130,7 @@ extern void yyerror(TParseContext&, const char*);
 %type <interm.intermTypedNode> expression int_expression assign_expression
 %type <interm.intermNode>      sampler_init_item
 %type <interm.intermTypedNode> unary_expression mul_expression add_expression
-%type <interm.intermTypedNode> rel_expression eq_expression 
+%type <interm.intermTypedNode> rel_expression eq_expression
 %type <interm.intermTypedNode> cond_expression const_expression
 %type <interm.intermTypedNode> log_or_expression log_xor_expression log_and_expression
 %type <interm.intermTypedNode> shift_expression and_expression xor_expression or_expression
@@ -142,7 +142,7 @@ extern void yyerror(TParseContext&, const char*);
 
 %type <interm.intermNode> translation_unit function_definition
 %type <interm.intermNode> statement simple_statement
-%type <interm.intermAggregate>  statement_list compound_statement 
+%type <interm.intermAggregate>  statement_list compound_statement
 %type <interm.intermNode> declaration_statement selection_statement expression_statement
 %type <interm.intermNode> external_declaration
 %type <interm.intermDeclaration> declaration
@@ -154,13 +154,13 @@ extern void yyerror(TParseContext&, const char*);
 %type <interm> parameter_declaration parameter_declarator parameter_type_specifier
 %type <interm.qualifier> parameter_qualifier
 
-%type <interm.type> type_qualifier fully_specified_type type_specifier 
+%type <interm.type> type_qualifier fully_specified_type type_specifier
 %type <interm.type> type_specifier_nonarray
-%type <interm.type> struct_specifier 
-%type <interm.typeLine> struct_declarator 
+%type <interm.type> struct_specifier
+%type <interm.typeLine> struct_declarator
 %type <interm.typeList> struct_declarator_list struct_declaration struct_declaration_list
 %type <interm.function> function_header function_declarator function_identifier
-%type <interm.function> function_header_with_parameters function_call_header 
+%type <interm.function> function_header_with_parameters function_call_header
 %type <interm> function_call_header_with_parameters function_call_header_no_parameters function_call_generic function_prototype
 %type <interm> function_call_or_method
 
@@ -169,10 +169,10 @@ extern void yyerror(TParseContext&, const char*);
 %type <lex> annotation_item semantic
 %type <lex> register_specifier
 
-%start translation_unit 
+%start translation_unit
 %%
 
-variable_identifier 
+variable_identifier
     : IDENTIFIER {
         // The symbol table search was done in the lexical phase
         const TSymbol* symbol = $1.symbol;
@@ -185,7 +185,7 @@ variable_identifier
             parseContext.symbolTable.insert(*fakeVariable);
             variable = fakeVariable;
         } else {
-            // This identifier can only be a variable type symbol 
+            // This identifier can only be a variable type symbol
             if (! symbol->isVariable()) {
                 parseContext.error($1.line, "variable expected", $1.string->c_str(), "");
                 parseContext.recover();
@@ -195,7 +195,7 @@ variable_identifier
 
         // don't delete $1.string, it's used by error recovery, and the pool
         // pop will reclaim the memory
-		
+
 		if (variable->getType().getQualifier() == EvqConst && variable->constValue)
 		{
 			TIntermConstant* c = ir_add_constant(variable->getType(), $1.line);
@@ -213,6 +213,11 @@ variable_identifier
 primary_expression
     : variable_identifier {
         $$ = $1;
+    }
+    | UINTCONSTANT {
+        TIntermConstant* constant = ir_add_constant(TType(EbtUInt, EbpUndefined, EvqConst), $1.line);
+		constant->setValue($1.i);
+		$$ = constant;
     }
     | INTCONSTANT {
         TIntermConstant* constant = ir_add_constant(TType(EbtInt, EbpUndefined, EvqConst), $1.line);
@@ -235,9 +240,9 @@ primary_expression
     ;
 
 postfix_expression
-    : primary_expression { 
+    : primary_expression {
         $$ = $1;
-    } 
+    }
     | postfix_expression LEFT_BRACKET int_expression RIGHT_BRACKET {
         if (!$1) {
             parseContext.error($2.line, " left of '[' is null ", "expression", "");
@@ -259,10 +264,10 @@ postfix_expression
 					if ($1->getType().getArraySize() == 0) {
 						if ($1->getType().getMaxArraySize() <= $3->getAsConstant()->toInt()) {
 							if (parseContext.arraySetMaxSize($1->getAsSymbolNode(), $1->getTypePointer(), $3->getAsConstant()->toInt(), true, $2.line))
-								parseContext.recover(); 
+								parseContext.recover();
 						} else {
 							if (parseContext.arraySetMaxSize($1->getAsSymbolNode(), $1->getTypePointer(), 0, false, $2.line))
-								parseContext.recover(); 
+								parseContext.recover();
 						}
 					} else if ( $3->getAsConstant()->toInt() >= $1->getType().getArraySize()) {
 						parseContext.error($2.line, "", "[", "array index out of range '%d'", $3->getAsConstant()->toInt());
@@ -276,7 +281,7 @@ postfix_expression
 				parseContext.error($2.line, "", "[", "array must be redeclared with a size before being indexed with a variable");
 				parseContext.recover();
 			}
-			
+
 			$$ = ir_add_index(EOpIndexIndirect, $1, $3, $2.line);
 		}
         if ($$ == 0) {
@@ -288,16 +293,16 @@ postfix_expression
                 $$->setType(TType($1->getType().getStruct(), $1->getType().getTypeName(), EbpUndefined, $1->getLine()));
             else
                 $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqTemporary, $1->getColsCount(),$1->getRowsCount(),  $1->isMatrix()));
-                
+
             if ($1->getType().getQualifier() == EvqConst)
                 $$->getTypePointer()->changeQualifier(EvqConst);
-        } else if ($1->isMatrix() && $1->getType().getQualifier() == EvqConst)         
+        } else if ($1->isMatrix() && $1->getType().getQualifier() == EvqConst)
             $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqConst, 1, $1->getColsCount()));
-        else if ($1->isMatrix())            
+        else if ($1->isMatrix())
             $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqTemporary, 1, $1->getColsCount()));
-        else if ($1->isVector() && $1->getType().getQualifier() == EvqConst)          
+        else if ($1->isVector() && $1->getType().getQualifier() == EvqConst)
             $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqConst));
-        else if ($1->isVector())       
+        else if ($1->isVector())
             $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqTemporary));
         else
             $$->setType($1->getType());
@@ -333,10 +338,10 @@ postfix_expression
             }
 
             TString vectorString = *$3.string;
-            TIntermTyped* index = ir_add_swizzle(fields, $3.line);                
+            TIntermTyped* index = ir_add_swizzle(fields, $3.line);
             $$ = ir_add_index(EOpMatrixSwizzle, $1, index, $2.line);
             $$->setType(TType($1->getBasicType(), $1->getPrecision(), EvqTemporary, 1, fields.num));
-                    
+
         } else if ($1->getBasicType() == EbtStruct) {
             bool fieldFound = false;
             TTypeList* fields = $1->getType().getStruct();
@@ -355,7 +360,7 @@ postfix_expression
                 if (fieldFound) {
 					TIntermConstant* index = ir_add_constant(TType(EbtInt, EbpUndefined, EvqConst), $3.line);
 					index->setValue(i);
-					$$ = ir_add_index(EOpIndexDirectStruct, $1, index, $2.line);                
+					$$ = ir_add_index(EOpIndexDirectStruct, $1, index, $2.line);
 					$$->setType(*(*fields)[i].type);
                 } else {
                     parseContext.error($2.line, " no such field in structure", $3.string->c_str(), "");
@@ -414,16 +419,21 @@ postfix_expression
     }
     ;
 
-int_expression 
+int_expression
     : expression {
         if (parseContext.scalarErrorCheck($1, "[]"))
             parseContext.recover();
         TType type(EbtInt, EbpUndefined);
         $$ = parseContext.constructBuiltIn(&type, EOpConstructInt, $1, $1->getLine(), true);
         if ($$ == 0) {
-            parseContext.error($1->getLine(), "cannot convert to index", "[]", "");
             parseContext.recover();
-            $$ = $1;
+            TType type2(EbtUInt, EbpUndefined);
+            $$ = parseContext.constructBuiltIn(&type2, EOpConstructUInt, $1, $1->getLine(), true);
+            if ($$ == 0) {
+                parseContext.error($1->getLine(), "cannot convert to index", "[]", "");
+                parseContext.recover();
+                $$ = $1;
+            }
         }
     }
     ;
@@ -511,10 +521,10 @@ function_call
                     }
                 } else {
                     // This is a real function call
-                    
+
                     $$ = ir_set_aggregate_op($1.intermAggregate, EOpFunctionCall, $1.line);
-                    $$->setType(fnCandidate->getReturnType());                   
-                    
+                    $$->setType(fnCandidate->getReturnType());
+
                     $$->getAsAggregate()->setName(fnCandidate->getMangledName());
                     $$->getAsAggregate()->setPlainName(fnCandidate->getName());
 
@@ -533,7 +543,7 @@ function_call
             } else {
                 // error message was put out by PaFindFunction()
                 // Put on a dummy node for error recovery
-                
+
 				TIntermConstant* constant = ir_add_constant(TType(EbtFloat, EbpUndefined, EvqConst), $1.line);
 				constant->setValue(0.f);
 				$$ = constant;
@@ -645,7 +655,7 @@ function_identifier
         }
     }
     | IDENTIFIER {
-		if (parseContext.reservedErrorCheck($1.line, *$1.string)) 
+		if (parseContext.reservedErrorCheck($1.line, *$1.string))
 			parseContext.recover();
 		TType type(EbtVoid, EbpUndefined);
 		const TString *mangled;
@@ -657,7 +667,7 @@ function_identifier
 		$$ = function;
 	}
     | FIELD_SELECTION {
-		if (parseContext.reservedErrorCheck($1.line, *$1.string)) 
+		if (parseContext.reservedErrorCheck($1.line, *$1.string))
 			parseContext.recover();
 		TType type(EbtVoid, EbpUndefined);
 		TFunction *function = new TFunction($1.string, type);
@@ -818,9 +828,9 @@ cond_expression
     | log_or_expression QUESTION expression COLON assign_expression {
        if (parseContext.boolOrVectorErrorCheck($2.line, $1))
             parseContext.recover();
-       
+
 		$$ = ir_add_selection($1, $3, $5, $2.line, parseContext.infoSink);
-           
+
         if ($$ == 0) {
             parseContext.binaryOpError($2.line, ":", $3->getCompleteString(), $5->getCompleteString());
             parseContext.recover();
@@ -831,7 +841,7 @@ cond_expression
 
 assign_expression
     : cond_expression { $$ = $1; }
-    | unary_expression assignment_operator assign_expression {        
+    | unary_expression assignment_operator assign_expression {
         if (parseContext.lValueErrorCheck($2.line, "assign", $1))
             parseContext.recover();
         $$ = parseContext.addAssign($2.op, $1, $3, $2.line);
@@ -1061,7 +1071,7 @@ parameter_declarator
             parseContext.recover();
         TParameter param = {$2.string, new TTypeInfo("", *$3.string, 0), new TType($1)};
         $$.line = $2.line;
-        $$.param = param; 
+        $$.param = param;
     }
     | type_specifier IDENTIFIER COLON IDENTIFIER {
         //Parameter with semantic
@@ -1206,18 +1216,18 @@ init_declarator_list
         $$ = $1;
     }
     | init_declarator_list COMMA IDENTIFIER type_info {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 	    TPublicType type = ir_get_decl_type_noarray($1);
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-        
+
         if (parseContext.nonInitConstErrorCheck($3.line, *$3.string, type))
             parseContext.recover();
 
         if (parseContext.nonInitErrorCheck($3.line, *$3.string, $4, type))
             parseContext.recover();
-		
+
 		TSymbol* sym = parseContext.symbolTable.find(*$3.string);
 		if (!sym)
 			$$ = $1;
@@ -1225,24 +1235,24 @@ init_declarator_list
 			$$ = ir_grow_declaration($1, sym, NULL, parseContext);
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 
 		TPublicType type = ir_get_decl_type_noarray($1);
-		
+
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-            
+
         if (parseContext.nonInitConstErrorCheck($3.line, *$3.string, type))
             parseContext.recover();
-        
+
         if (parseContext.arrayTypeErrorCheck($4.line, type) || parseContext.arrayQualifierErrorCheck($4.line, type))
             parseContext.recover();
         else {
             TVariable* variable;
             if (parseContext.arrayErrorCheck($4.line, *$3.string, $6, type, variable))
                 parseContext.recover();
-		
+
 			if (!variable)
 				$$ = $1;
 			else {
@@ -1252,13 +1262,13 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
-		
+
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-            
+
         if (parseContext.nonInitConstErrorCheck($3.line, *$3.string, type))
             parseContext.recover();
 
@@ -1269,11 +1279,11 @@ init_declarator_list
             if (parseContext.arraySizeErrorCheck($4.line, $5, size))
                 parseContext.recover();
             type.setArray(true, size);
-			
+
             TVariable* variable;
             if (parseContext.arrayErrorCheck($4.line, *$3.string, $7, type, variable))
                 parseContext.recover();
-			
+
 			if (!variable)
 				$$ = $1;
 			else {
@@ -1282,19 +1292,19 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
-		
+
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-            
+
         TVariable* variable = 0;
         if (parseContext.arrayTypeErrorCheck($4.line, type) || parseContext.arrayQualifierErrorCheck($4.line, type))
             parseContext.recover();
         else if (parseContext.arrayErrorCheck($4.line, *$3.string, type, variable))
 			parseContext.recover();
-		
+
         {
             TIntermSymbol* symbol;
             type.setArray(true, $8->getType().getArraySize());
@@ -1311,21 +1321,21 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
 		int array_size;
-		
+
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-            
+
         TVariable* variable = 0;
         if (parseContext.arrayTypeErrorCheck($4.line, type) || parseContext.arrayQualifierErrorCheck($4.line, type))
             parseContext.recover();
         else {
             if (parseContext.arraySizeErrorCheck($4.line, $5, array_size))
                 parseContext.recover();
-			
+
             type.setArray(true, array_size);
             if (parseContext.arrayErrorCheck($4.line, *$3.string, $7, type, variable))
                 parseContext.recover();
@@ -1346,20 +1356,20 @@ init_declarator_list
         }
     }
     | init_declarator_list COMMA IDENTIFIER type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($3.line, *$3.string)) 
+	    if (parseContext.reservedErrorCheck($3.line, *$3.string))
 		    parseContext.recover();
 		TPublicType type = ir_get_decl_type_noarray($1);
-		
+
         if (parseContext.structQualifierErrorCheck($3.line, type))
             parseContext.recover();
-			
+
         TIntermSymbol* symbol;
 		if ( !IsSampler(type.type)) {
 			if (!parseContext.executeInitializer($3.line, *$3.string, $4, type, $6, symbol)) {
 				TSymbol* variable = parseContext.symbolTable.find(*$3.string);
 				if (!variable)
 					$$ = $1;
-				else 				
+				else
 					$$ = ir_grow_declaration($1, variable, $6, parseContext);
 			} else {
 				parseContext.recover();
@@ -1370,33 +1380,33 @@ init_declarator_list
 			$$ = $1;
 			if (parseContext.structQualifierErrorCheck($3.line, type))
 				parseContext.recover();
-			
+
 			if (parseContext.nonInitConstErrorCheck($3.line, *$3.string, type))
 				parseContext.recover();
-			
+
 			if (parseContext.nonInitErrorCheck($3.line, *$3.string, $4, type))
 				parseContext.recover();
 		}
 	}
     ;
 
-single_declaration 
+single_declaration
     : fully_specified_type {
 		$$ = 0;
-    }    
-    | fully_specified_type IDENTIFIER type_info {				
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+    }
+    | fully_specified_type IDENTIFIER type_info {
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 		bool error = false;
         if (error &= parseContext.structQualifierErrorCheck($2.line, $1))
             parseContext.recover();
-        
+
         if (error &= parseContext.nonInitConstErrorCheck($2.line, *$2.string, $1))
             parseContext.recover();
 
         if (error &= parseContext.nonInitErrorCheck($2.line, *$2.string, $3, $1))
             parseContext.recover();
-		
+
 		TSymbol* symbol = parseContext.symbolTable.find(*$2.string);
 		if (!error && symbol) {
 			$$ = ir_add_declaration(symbol, NULL, $2.line, parseContext);
@@ -1405,7 +1415,7 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info {
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 
         if (parseContext.structQualifierErrorCheck($2.line, $1))
@@ -1422,7 +1432,7 @@ single_declaration
             if (parseContext.arrayErrorCheck($3.line, *$2.string, $5, $1, variable))
                 parseContext.recover();
         }
-		
+
 		TSymbol* symbol = parseContext.symbolTable.find(*$2.string);
 		if (symbol) {
 			$$ = ir_add_declaration(symbol, NULL, $2.line, parseContext);
@@ -1431,7 +1441,7 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info {
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 
         if (parseContext.structQualifierErrorCheck($2.line, $1))
@@ -1439,7 +1449,7 @@ single_declaration
 
         if (parseContext.nonInitConstErrorCheck($2.line, *$2.string, $1))
 			parseContext.recover();
-		
+
 		TVariable* variable;
         if (parseContext.arrayTypeErrorCheck($3.line, $1) || parseContext.arrayQualifierErrorCheck($3.line, $1))
             parseContext.recover();
@@ -1451,7 +1461,7 @@ single_declaration
             $1.setArray(true, size);
             if (parseContext.arrayErrorCheck($3.line, *$2.string, $6, $1, variable))
                 parseContext.recover();
-			
+
 			if (variable) {
 				$$ = ir_add_declaration(variable, NULL, $2.line, parseContext);
 			} else {
@@ -1460,7 +1470,7 @@ single_declaration
         }
 	}
     | fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 		if (parseContext.structQualifierErrorCheck($2.line, $1))
 			parseContext.recover();
@@ -1474,7 +1484,7 @@ single_declaration
 				parseContext.recover();
 		}
 
-		{        
+		{
 			TIntermSymbol* symbol;
 			if (!parseContext.executeInitializer($2.line, *$2.string, $5, $1, $7, symbol, variable)) {
 				if (variable)
@@ -1488,7 +1498,7 @@ single_declaration
 		}
     }
     | fully_specified_type IDENTIFIER LEFT_BRACKET const_expression RIGHT_BRACKET type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 
         if (parseContext.structQualifierErrorCheck($2.line, $1))
@@ -1506,8 +1516,8 @@ single_declaration
             if (parseContext.arrayErrorCheck($3.line, *$2.string, $6, $1, variable))
                 parseContext.recover();
         }
-        
-		{        
+
+		{
 			TIntermSymbol* symbol;
 			if (!parseContext.executeInitializer($2.line, *$2.string, $6, $1, $8, symbol, variable)) {
 				if (variable)
@@ -1518,15 +1528,15 @@ single_declaration
 				parseContext.recover();
 				$$ = 0;
 			}
-		}       
+		}
     }
     | fully_specified_type IDENTIFIER type_info EQUAL initializer {
-	    if (parseContext.reservedErrorCheck($2.line, *$2.string)) 
+	    if (parseContext.reservedErrorCheck($2.line, *$2.string))
 		    parseContext.recover();
 
 		if (parseContext.structQualifierErrorCheck($2.line, $1))
 			parseContext.recover();
-		
+
 		TIntermSymbol* symbol;
 		if (!parseContext.executeInitializer($2.line, *$2.string, $3, $1, $5, symbol)) {
 			if (symbol)
@@ -1563,11 +1573,11 @@ fully_specified_type
         }
 
         if ($1.qualifier == EvqAttribute &&
-            ($2.type == EbtBool || $2.type == EbtInt)) {
+            ($2.type == EbtBool || $2.type == EbtInt || $2.type == EbtUInt)) {
             parseContext.error($2.line, "cannot be bool or int", getQualifierString($1.qualifier), "");
             parseContext.recover();
         }
-        $$ = $2; 
+        $$ = $2;
         $$.qualifier = $1.qualifier;
     }
     ;
@@ -1626,6 +1636,9 @@ type_specifier_nonarray
     | INT_TYPE {
         SET_BASIC_TYPE($$,$1,EbtInt,EbpHigh);
     }
+    | UINT_TYPE {
+        SET_BASIC_TYPE($$,$1,EbtUInt,EbpHigh);
+    }
     | BOOL_TYPE {
         SET_BASIC_TYPE($$,$1,EbtBool,EbpHigh);
     }
@@ -1648,6 +1661,17 @@ type_specifier_nonarray
             $$.setBasic(EbtInt, qual, $1.line);
         } else {
             $$.setBasic(EbtInt, qual, $1.line);
+            $$.setVector($5.i);
+        }
+    }
+    | VECTOR LEFT_ANGLE UINT_TYPE COMMA INTCONSTANT RIGHT_ANGLE {
+        TQualifier qual = parseContext.getDefaultQualifier();
+        if ( $5.i > 4 || $5.i < 1 ) {
+            parseContext.error($2.line, "vector dimension out of range", "", "");
+            parseContext.recover();
+            $$.setBasic(EbtUInt, qual, $1.line);
+        } else {
+            $$.setBasic(EbtUInt, qual, $1.line);
             $$.setVector($5.i);
         }
     }
@@ -1720,6 +1744,18 @@ type_specifier_nonarray
     }
     | IVEC4 {
         SET_BASIC_TYPE($$,$1,EbtInt,EbpHigh);
+        $$.setVector(4);
+    }
+    | UVEC2 {
+        SET_BASIC_TYPE($$,$1,EbtUInt,EbpHigh);
+        $$.setVector(2);
+    }
+    | UVEC3 {
+        SET_BASIC_TYPE($$,$1,EbtUInt,EbpHigh);
+        $$.setVector(3);
+    }
+    | UVEC4 {
+        SET_BASIC_TYPE($$,$1,EbtUInt,EbpHigh);
         $$.setVector(4);
     }
     | MATRIX2x2 {
@@ -1850,16 +1886,16 @@ type_specifier_nonarray
     }
 	| TEXTURE {
         SET_BASIC_TYPE($$,$1,EbtTexture,EbpUndefined);
-    }  
+    }
     | SAMPLERGENERIC {
         SET_BASIC_TYPE($$,$1,EbtSamplerGeneric,EbpUndefined);
-    }  
+    }
     | SAMPLER1D {
         SET_BASIC_TYPE($$,$1,EbtSampler1D,EbpUndefined);
-    } 
+    }
     | SAMPLER2D {
         SET_BASIC_TYPE($$,$1,EbtSampler2D,EbpUndefined);
-    } 
+    }
 	| SAMPLER2D_HALF {
 		SET_BASIC_TYPE($$,$1,EbtSampler2D,EbpMedium);
 	}
@@ -1868,10 +1904,10 @@ type_specifier_nonarray
 	}
     | SAMPLER3D {
         SET_BASIC_TYPE($$,$1,EbtSampler3D,EbpLow);
-    } 
+    }
     | SAMPLERCUBE {
         SET_BASIC_TYPE($$,$1,EbtSamplerCube,EbpUndefined);
-    } 
+    }
 	| SAMPLERCUBE_HALF {
 		SET_BASIC_TYPE($$,$1,EbtSamplerCube,EbpMedium);
 	}
@@ -1883,13 +1919,13 @@ type_specifier_nonarray
     }
     | SAMPLERRECTSHADOW {
         SET_BASIC_TYPE($$,$1,EbtSamplerRectShadow,EbpLow); // ES3 doesn't have default precision for shadow samplers, so always emit lowp
-    } 
+    }
     | SAMPLER1DSHADOW {
         SET_BASIC_TYPE($$,$1,EbtSampler1DShadow,EbpLow); // ES3 doesn't have default precision for shadow samplers, so always emit lowp
-    } 
+    }
     | SAMPLER2DSHADOW {
         SET_BASIC_TYPE($$,$1,EbtSampler2DShadow,EbpLow); // ES3 doesn't have default precision for shadow samplers, so always emit lowp
-    }     
+    }
 	| SAMPLER2DARRAY {
 		SET_BASIC_TYPE($$,$1,EbtSampler2DArray,EbpLow);
 	}
@@ -1961,7 +1997,7 @@ struct_declaration
             type->setColsCount($1.matcols);
             type->setRowsCount($1.matrows);
             type->setMatrix($1.matrix);
-            
+
             // don't allow arrays of arrays
             if (type->isArray()) {
                 if (parseContext.arrayTypeErrorCheck($1.line, $1))
@@ -2080,9 +2116,9 @@ compound_statement_no_new_scope
 
 statement_list
     : statement {
-        $$ = ir_make_aggregate($1, gNullSourceLoc); 
+        $$ = ir_make_aggregate($1, gNullSourceLoc);
     }
-    | statement_list statement { 
+    | statement_list statement {
         $$ = ir_grow_aggregate($1, $2, gNullSourceLoc);
     }
     ;
@@ -2145,7 +2181,7 @@ iteration_statement
     | DO { ++parseContext.loopNestingLevel; } statement WHILE LEFT_PAREN expression RIGHT_PAREN SEMICOLON {
         if (parseContext.boolErrorCheck($8.line, $6))
             parseContext.recover();
-                    
+
         $$ = ir_add_loop(ELoopDoWhile, $6, 0, $3, $4.line);
         --parseContext.loopNestingLevel;
     }
@@ -2195,14 +2231,14 @@ jump_statement
         if (parseContext.loopNestingLevel <= 0) {
             parseContext.error($1.line, "continue statement only allowed in loops", "", "");
             parseContext.recover();
-        }        
+        }
         $$ = ir_add_branch(EOpContinue, $1.line);
     }
     | BREAK SEMICOLON {
         if (parseContext.loopNestingLevel <= 0) {
             parseContext.error($1.line, "break statement only allowed in loops", "", "");
             parseContext.recover();
-        }        
+        }
         $$ = ir_add_branch(EOpBreak, $1.line);
     }
     | RETURN SEMICOLON {
@@ -2320,9 +2356,9 @@ function_definition
 
                 //
                 // Add the parameter to the HIL
-                //                
+                //
                 paramNodes = ir_grow_aggregate(
-                                               paramNodes, 
+                                               paramNodes,
                                                ir_add_symbol(variable, $1.line),
                                                $1.line);
             } else {
@@ -2346,7 +2382,7 @@ function_definition
         $$->getAsAggregate()->setName($1.function->getMangledName().c_str());
         $$->getAsAggregate()->setPlainName($1.function->getName().c_str());
         $$->getAsAggregate()->setType($1.function->getReturnType());
-        
+
 	if ( $1.function->getInfo())
 	    $$->getAsAggregate()->setSemantic($1.function->getInfo()->getSemantic());
     }
@@ -2365,7 +2401,7 @@ initialization_list
 initializer_list
     : assign_expression {
         //create a new aggNode
-       $$ = ir_make_aggregate( $1, $1->getLine());       
+       $$ = ir_make_aggregate( $1, $1->getLine());
     }
     | initialization_list {
        //take the inherited aggNode and return it
@@ -2373,7 +2409,7 @@ initializer_list
     }
     | initializer_list COMMA assign_expression {
         // append to the aggNode
-       $$ = ir_grow_aggregate( $1, $3, $3->getLine());       
+       $$ = ir_grow_aggregate( $1, $3, $3->getLine());
     }
     | initializer_list COMMA initialization_list {
        // append all children or $3 to $1
@@ -2413,6 +2449,7 @@ ann_type
     | HALF_TYPE {}
     | FIXED_TYPE {}
     | INT_TYPE {}
+    | UINT_TYPE {}
     | BOOL_TYPE {}
     | STRING_TYPE {}
     | BVEC2 {}
@@ -2421,6 +2458,9 @@ ann_type
     | IVEC2 {}
     | IVEC3 {}
     | IVEC4 {}
+    | UVEC2 {}
+    | UVEC3 {}
+    | UVEC4 {}
     | VEC2 {}
     | VEC3 {}
     | VEC4 {}
@@ -2441,6 +2481,9 @@ ann_literal
 
 ann_numerical_constant
 	: INTCONSTANT {
+		$$.f = (float)$1.i;
+	}
+	| UINTCONSTANT {
 		$$.f = (float)$1.i;
 	}
 	| BOOLCONSTANT {

@@ -8,14 +8,14 @@
 
 TString* TParameter::NullSemantic = 0;
 
-bool TSymbolTableLevel::insert(TSymbol& symbol) 
+bool TSymbolTableLevel::insert(TSymbol& symbol)
 {
 	//
 	// returning true means symbol was added to the table
 	//
 	tInsertResult result;
 	result = level.insert(tLevelPair(symbol.getMangledName(), &symbol));
-	
+
 	return result.second;
 }
 
@@ -26,11 +26,12 @@ void TType::buildMangledName(TString& mangledName) const
 		mangledName += 'm';
 	else if (isVector())
 		mangledName += 'v';
-	
+
 	switch (type)
 	{
 		case EbtFloat:              mangledName += 'f';      break;
 		case EbtInt:                mangledName += 'i';      break;
+		case EbtUInt:               mangledName += 'u';      break;
 		case EbtBool:               mangledName += 'b';      break;
 		case EbtSamplerGeneric:     mangledName += "sg";     break;
 		case EbtSampler1D:          mangledName += "s1";     break;
@@ -53,7 +54,7 @@ void TType::buildMangledName(TString& mangledName) const
 				(*structure)[i].type->buildMangledName(mangledName);
 			}
 		}
-		default: 
+		default:
 			break;
 	}
 
@@ -82,11 +83,11 @@ int TType::getStructSize() const
 		assert(false && "Not a struct");
 		return 0;
 	}
-	
+
 	if (structureSize == 0)
 		for (TTypeList::iterator tl = getStruct()->begin(); tl != getStruct()->end(); tl++)
 			structureSize += ((*tl).type)->getObjectSize();
-	
+
 	return structureSize;
 }
 
@@ -176,7 +177,7 @@ TType::ECompatibility TType::determineCompatibility ( const TType *pType ) const
 }
 
 // Dump functions.
-void TVariable::dump(TInfoSink& infoSink) const 
+void TVariable::dump(TInfoSink& infoSink) const
 {
 	infoSink.debug << getName().c_str() << ": " << type.getQualifierString() << " " << type.getBasicString();
 	if (type.isArray())
@@ -191,7 +192,7 @@ void TFunction::dump(TInfoSink &infoSink) const
 	infoSink.debug << getName().c_str() << ": " <<  returnType.getBasicString() << " " << getMangledName().c_str() << "\n";
 }
 
-void TSymbolTableLevel::dump(TInfoSink &infoSink) const 
+void TSymbolTableLevel::dump(TInfoSink &infoSink) const
 {
 	tLevel::const_iterator it;
 	for (it = level.begin(); it != level.end(); ++it)
@@ -225,7 +226,7 @@ TSymbolTableLevel::~TSymbolTableLevel()
 // to be related to the provided built-in operation.  This is a low
 // performance operation, and only intended for symbol tables that
 // live across a large number of compiles.
-void TSymbolTableLevel::relateToOperator(const char* name, TOperator op) 
+void TSymbolTableLevel::relateToOperator(const char* name, TOperator op)
 {
 	tLevel::iterator it;
 	for (it = level.begin(); it != level.end(); ++it)
@@ -237,7 +238,7 @@ void TSymbolTableLevel::relateToOperator(const char* name, TOperator op)
 				function->relateToOperator(op);
 		}
 	}
-}    
+}
 
 
 TSymbol::TSymbol(const TSymbol& copyOf)
@@ -251,14 +252,14 @@ TVariable::TVariable(const TVariable& copyOf, TStructureMap& remapper) : TSymbol
 	type.copyType(copyOf.type, remapper);
 	userType = copyOf.userType;
 	// for builtIn symbol table level, unionArray and arrayInformation pointers should be NULL
-	assert(copyOf.arrayInformationType == 0); 
+	assert(copyOf.arrayInformationType == 0);
 	arrayInformationType = 0;
 }
 
-TVariable* TVariable::clone(TStructureMap& remapper) 
+TVariable* TVariable::clone(TStructureMap& remapper)
 {
 	TVariable *variable = new TVariable(*this, remapper);
-	
+
 	return variable;
 }
 
@@ -270,17 +271,17 @@ TFunction::TFunction(const TFunction& copyOf, TStructureMap& remapper) : TSymbol
 		parameters.push_back(param);
 		parameters.back().copyParam(copyOf.parameters[i], remapper);
 	}
-	
+
 	returnType.copyType(copyOf.returnType, remapper);
 	mangledName = copyOf.mangledName;
 	op = copyOf.op;
 	defined = copyOf.defined;
 }
 
-TFunction* TFunction::clone(TStructureMap& remapper) 
+TFunction* TFunction::clone(TStructureMap& remapper)
 {
 	TFunction *function = new TFunction(*this, remapper);
-	
+
 	return function;
 }
 
@@ -293,19 +294,19 @@ TSymbolTableLevel* TSymbolTableLevel::clone(TStructureMap& remapper)
 	{
 		symTableLevel->insert(*iter->second->clone(remapper));
 	}
-	
+
 	return symTableLevel;
 }
 
 // This function uses the matching rules as described in the Cg language doc (the closest
-// thing we have to HLSL function matching description) to find a matching compatible function.  
+// thing we have to HLSL function matching description) to find a matching compatible function.
 TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguous) const
 {
 	ambiguous = false;
-	
-	const TString &name = call->getName();   
+
+	const TString &name = call->getName();
 	std::vector<TFunction*> funcList;
-	
+
 	// 1 and 2. Add all functions with matching names and argument count to the set to consider
 	tLevel::const_iterator it = level.begin();
 	while (it != level.end())
@@ -318,12 +319,12 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 		}
 		++it;
 	}
-		
-	// For each actual parameter expression, in the sequence:   
+
+	// For each actual parameter expression, in the sequence:
 	for ( int nParam = 0; nParam < call->getParamCount() ; nParam++ )
 	{
-		const TType* type0 = (*call)[nParam].type;      
-		
+		const TType* type0 = (*call)[nParam].type;
+
 		// From the Cg function matching rules, perform the following matching on each parameter
 		//
 		// 3. For each parameter in the expression, if the type matches exactly, remove
@@ -339,7 +340,7 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 		//        implicit cast with promotion.  This additional rule favors implict casts over
 		//        implicit casts that also require promotion ***
 		//    If there is a implicit cast with a promotion for the type of the actual parameter to the unqualified type
-		//    of the formal parameter of any function, remove all functions for which this is not true     
+		//    of the formal parameter of any function, remove all functions for which this is not true
 		//
 		// 7. *** Not part of Cg rules, but used to allow HLSL upward promotion on function calls ***
 		//    If there is an upward vector promotion for the type of the actual parameter to the unqualified type
@@ -352,31 +353,31 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 			TType::IMPLICIT_CAST_WITH_PROMOTION_EXISTS,
 			TType::UPWARD_VECTOR_PROMOTION_EXISTS
 		};
-		
+
 		// Iterate over each matching type (declared above)
 		for ( int nIter = 0; nIter < sizeof(eCompatType) / sizeof (TType::ECompatibility); nIter++ )
 		{
 			bool bMatchesCompatibility = false;
-			
+
 			// Grab the compatibility type for the test
 			TType::ECompatibility eCompatibility = eCompatType[nIter];
-			
+
 			std::vector<TFunction*>::iterator funcIter = funcList.begin();
 			while (funcIter != funcList.end())
 			{
 				const TFunction* curFunc = *(funcIter);
 				const TType* type1 = (*curFunc)[nParam].type;
-				
+
 				// Check to see if the compatibility matches the compatibility type for this test
 				if ( type0->determineCompatibility ( type1 ) == eCompatibility )
 				{
 					bMatchesCompatibility = true;
-					break;               
+					break;
 				}
-				
+
 				funcIter++;
 			}
-			
+
 			if ( bMatchesCompatibility )
 			{
 				// Remove all that don't match this compatibility test
@@ -385,10 +386,10 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 				{
 					TFunction* curFunc = *(funcIter);
 					const TType* type1 = (*curFunc)[nParam].type;
-					
+
 					if ( type0->determineCompatibility ( type1 ) != eCompatibility )
 					{
-						funcIter = funcList.erase ( funcIter );               
+						funcIter = funcList.erase ( funcIter );
 					}
 					else
 						funcIter++;
@@ -396,8 +397,8 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 			}
 		}
 	}
-	
-	
+
+
 	// If the function list has 1 element, then we were successful
 	if ( funcList.size() == 1 )
 		return funcList.front();
@@ -407,7 +408,7 @@ TSymbol* TSymbolTableLevel::findCompatible (const TFunction *call, bool &ambiguo
 		ambiguous = true;
 		return NULL;
 	}
-	
+
 	// No function found
 	return NULL;
 }

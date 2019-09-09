@@ -53,6 +53,10 @@ typedef enum
 	EShTypeIVec2,
 	EShTypeIVec3,
 	EShTypeIVec4,
+	EShTypeUInt,
+	EShTypeUVec2,
+	EShTypeUVec3,
+	EShTypeUVec4,
 	EShTypeFloat,
 	EShTypeVec2,
 	EShTypeVec3,
@@ -199,7 +203,7 @@ enum TTranslateOptions
 	///			samples[1] = vec2(0.0, 0.5);
 	///			samples[2] = vec2(1.0, 0.1);
 	///		#else
-	///			const vec2 samples[] = vec2[](vec2(-1.0, 0.1), vec2(0.0, 0.5), vec2(1.0, 0.1)); 
+	///			const vec2 samples[] = vec2[](vec2(-1.0, 0.1), vec2(0.0, 0.5), vec2(1.0, 0.1));
 	///		#endif
 	ETranslateOpEmitGLSL120ArrayInitWorkaround = (1<<1),
 
@@ -207,7 +211,7 @@ enum TTranslateOptions
 	//  we will output an attribute "xlat_attrib_TEXCOORD0". Targeting GLSL ES forces this
 	//  as there are no built-in attributes in that variant.
 	ETranslateOpAvoidBuiltinAttribNames = (1<<2),
-	
+
 	// Always use "gl_MultiTexCoord0" for "TEXCOORD0" and so on,
 	// even in GLSL ES. It is expected that client code will add #defines to handle them
 	// later on.
@@ -225,7 +229,7 @@ enum TTranslateOptions
 /// If handle creation fails, 0 will be returned.
 class HlslCrossCompiler;
 typedef HlslCrossCompiler* ShHandle;
-	
+
 
 /// Initialize the HLSL2GLSL translator.  This function must be called once prior to calling any other
 /// HLSL2GLSL translator functions
@@ -238,7 +242,7 @@ SH_IMPORT_EXPORT int C_DECL Hlsl2Glsl_Initialize();
 SH_IMPORT_EXPORT void C_DECL Hlsl2Glsl_Shutdown();
 
 /// Construct a compiler for the given language (one per shader)
-SH_IMPORT_EXPORT ShHandle C_DECL Hlsl2Glsl_ConstructCompiler( const EShLanguage language );  
+SH_IMPORT_EXPORT ShHandle C_DECL Hlsl2Glsl_ConstructCompiler( const EShLanguage language );
 
 
 SH_IMPORT_EXPORT void C_DECL Hlsl2Glsl_DestructCompiler( ShHandle handle );
@@ -291,23 +295,23 @@ SH_IMPORT_EXPORT int C_DECL Hlsl2Glsl_GetUniformCount( const ShHandle handle );
 SH_IMPORT_EXPORT const ShUniformInfo* C_DECL Hlsl2Glsl_GetUniformInfo( const ShHandle handle );
 
 
-/// Instead of mapping HLSL attributes to GLSL fixed-function attributes, this function can be used to 
-/// override the  attribute mapping.  This tells the code generator to use user-defined attributes for 
+/// Instead of mapping HLSL attributes to GLSL fixed-function attributes, this function can be used to
+/// override the  attribute mapping.  This tells the code generator to use user-defined attributes for
 /// the semantics that are specified.
 ///
 /// \param handle
 ///      Handle to the compiler.  This should be called BEFORE calling Hlsl2Glsl_Translate
-/// \param pSemanticEnums 
+/// \param pSemanticEnums
 ///      Array of semantic enums to set
-/// \param pSemanticNames 
+/// \param pSemanticNames
 ///      Array of user attribute names to use
-/// \param nNumSemantics 
+/// \param nNumSemantics
 ///      Number of semantics to set in the arrays
 /// \return
 ///      1 on success, 0 on failure
-SH_IMPORT_EXPORT int C_DECL Hlsl2Glsl_SetUserAttributeNames ( ShHandle handle, 
-                                                              const EAttribSemantic *pSemanticEnums, 
-                                                              const char *pSemanticNames[], 
+SH_IMPORT_EXPORT int C_DECL Hlsl2Glsl_SetUserAttributeNames ( ShHandle handle,
+                                                              const EAttribSemantic *pSemanticEnums,
+                                                              const char *pSemanticNames[],
                                                               int nNumSemantics );
 
 

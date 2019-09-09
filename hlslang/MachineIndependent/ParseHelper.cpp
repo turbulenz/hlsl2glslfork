@@ -973,7 +973,7 @@ bool TParseContext::boolErrorCheck(const TSourceLoc& line, const TIntermTyped* t
 {
    // In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
    // float, or int.
-   if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) ||
+   if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtUInt && type->getBasicType() != EbtFloat) ||
         type->isArray() || type->isMatrix() || type->isVector())
    {
       error(line, "boolean expression expected", "", "");
@@ -988,7 +988,7 @@ bool TParseContext::boolOrVectorErrorCheck(const TSourceLoc& line, const TInterm
 {
 	// In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
 	// float, or int.
-	if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtFloat) ||
+	if ((type->getBasicType() != EbtBool && type->getBasicType() != EbtInt && type->getBasicType() != EbtUInt && type->getBasicType() != EbtFloat) ||
         type->isArray() || type->isMatrix())
 	{
 		error(line, "boolean or vector expression expected", "", "");
@@ -1007,7 +1007,7 @@ bool TParseContext::boolErrorCheck(const TSourceLoc& line, const TPublicType& pT
 {
    // In HLSL, any float or int will be automatically casted to a bool, so the basic type can be bool,
    // float, or int.
-   if ((pType.type != EbtBool && pType.type != EbtInt && pType.type != EbtFloat) ||
+   if ((pType.type != EbtBool && pType.type != EbtInt && pType.type != EbtUInt && pType.type != EbtFloat) ||
         pType.array || pType.matrix || (pType.matcols > 1) || (pType.matrows > 1))
    {
       error(line, "boolean expression expected", "", "");
@@ -1114,7 +1114,7 @@ bool TParseContext::insertBuiltInArrayAtGlobalLevel()
 bool TParseContext::arraySizeErrorCheck(const TSourceLoc& line, TIntermTyped* expr, int& size)
 {
 	TIntermConstant* constant = expr->getAsConstant();
-	if (constant == 0 || constant->getBasicType() != EbtInt)
+	if (constant == 0 || (constant->getBasicType() != EbtInt && constant->getBasicType() != EbtUInt))
 	{
 		delete expr;
 		error(line, "array size must be a constant integer expression", "", "");
@@ -1571,7 +1571,7 @@ bool TParseContext::executeInitializer(TSourceLoc line,
 			const TBasicType initializerType = initializer->getType().getBasicType();
 
 			// allow type promotion (eg: const float SCALE = 2;)
-			if ((basicType == EbtFloat) && (initializerType == EbtInt) && (type.getObjectSize() == initializer->getType().getObjectSize()))
+			if ((basicType == EbtFloat) && (initializerType == EbtInt || initializerType == EbtUInt) && (type.getObjectSize() == initializer->getType().getObjectSize()))
 			{
 				// allow this
 			}
@@ -1769,6 +1769,16 @@ TOperator TParseContext::getConstructorOp( const TType& type)
       default: op = EOpNull; break;
       }
       break;
+   case EbtUInt:
+      switch (type.getRowsCount())
+      {
+      case 1: op = EOpConstructUInt; break;
+      case 2: op = EOpConstructUVec2; break;
+      case 3: op = EOpConstructUVec3; break;
+      case 4: op = EOpConstructUVec4; break;
+      default: op = EOpNull; break;
+      }
+      break;
    case EbtBool:
       switch (type.getRowsCount())
       {
@@ -1951,6 +1961,13 @@ TIntermTyped* TParseContext::constructBuiltIn(const TType* type, TOperator op, T
 	case EOpConstructIVec4:
 	case EOpConstructInt:
 		basicOp = EOpConstructInt;
+		break;
+
+	case EOpConstructUVec2:
+	case EOpConstructUVec3:
+	case EOpConstructUVec4:
+	case EOpConstructUInt:
+		basicOp = EOpConstructUInt;
 		break;
 
 	case EOpConstructBVec2:

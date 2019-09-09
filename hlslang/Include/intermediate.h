@@ -45,11 +45,17 @@ enum TOperator
 	EOpPreDecrement,
 
 	EOpConvIntToBool,
+	EOpConvUIntToBool,
 	EOpConvFloatToBool,
 	EOpConvBoolToFloat,
 	EOpConvIntToFloat,
 	EOpConvFloatToInt,
 	EOpConvBoolToInt,
+	EOpConvUIntToFloat,
+	EOpConvFloatToUInt,
+	EOpConvBoolToUInt,
+	EOpConvIntToUInt,
+	EOpConvUIntToInt,
 
 	//
 	// binary operations
@@ -193,6 +199,7 @@ enum TOperator
 
 	// Constructors
 	EOpConstructInt,
+	EOpConstructUInt,
 	EOpConstructBool,
 	EOpConstructFloat,
 	EOpConstructVec2,
@@ -204,6 +211,9 @@ enum TOperator
 	EOpConstructIVec2,
 	EOpConstructIVec3,
 	EOpConstructIVec4,
+	EOpConstructUVec2,
+	EOpConstructUVec3,
+	EOpConstructUVec4,
 	EOpConstructMat2x2,
 	EOpConstructMat2x3,
 	EOpConstructMat2x4,

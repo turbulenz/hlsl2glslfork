@@ -27,6 +27,7 @@ enum TBasicType
    EbtVoid,
    EbtFloat,
    EbtInt,
+   EbtUInt,
    EbtBool,
    EbtGuardSamplerBegin,  // non type:  see implementation of IsSampler()
    EbtSamplerGeneric,     // untyped D3D sampler, assumes type via usage
@@ -40,7 +41,7 @@ enum TBasicType
    EbtSamplerRectShadow,  // ARB_texture_rectangle
    EbtSampler2DArray,
    EbtGuardSamplerEnd,    // non type:  see implementation of IsSampler()
-   EbtTexture,            // HLSL Texture variable (presently just a dummy) 
+   EbtTexture,            // HLSL Texture variable (presently just a dummy)
    EbtStruct,
 };
 
@@ -66,7 +67,7 @@ enum TQualifier
    EvqGlobal,        // For globals read/write
    EvqConst,         // User defined constants and non-output parameters in functions
    EvqStatic,        // Static variables
-   EvqAttribute,     // Readonly 
+   EvqAttribute,     // Readonly
    EvqUniform,       // Readonly, vertex and fragment
    EvqMutableUniform,// HLSL uniform that is modified by the shader
 
@@ -82,7 +83,7 @@ enum TQualifier
 //
 // This is just for debug print out, carried along with the definitions above.
 //
-__inline const char* getQualifierString(TQualifier q) 
+__inline const char* getQualifierString(TQualifier q)
 {
    switch (q)
    {

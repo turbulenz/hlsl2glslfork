@@ -8,16 +8,16 @@
 /* Based on
 ANSI C grammar, Lex specification
 
-In 1985, Jeff Lee published this Lex specification together with a Yacc 
-grammar for the April 30, 1985 ANSI C draft.  Tom Stockfisch reposted 
-both to net.sources in 1987; that original, as mentioned in the answer 
-to question 17.25 of the comp.lang.c FAQ, can be ftp'ed from ftp.uu.net, 
-file usenet/net.sources/ansi.c.grammar.Z. 
+In 1985, Jeff Lee published this Lex specification together with a Yacc
+grammar for the April 30, 1985 ANSI C draft.  Tom Stockfisch reposted
+both to net.sources in 1987; that original, as mentioned in the answer
+to question 17.25 of the comp.lang.c FAQ, can be ftp'ed from ftp.uu.net,
+file usenet/net.sources/ansi.c.grammar.Z.
 
-I intend to keep this version as close to the current C Standard grammar 
-as possible; please let me know if you discover discrepancies. 
+I intend to keep this version as close to the current C Standard grammar
+as possible; please let me know if you discover discrepancies.
 
-Jutta Degener, 1995 
+Jutta Degener, 1995
 */
 
 D           [0-9]
@@ -26,10 +26,11 @@ H           [a-fA-F0-9]
 E           [Ee][+-]?{D}+
 O           [0-7]
 F           [hHfF]
-I           [uUlL]
+I           [lL]
+U           [uU]
 
 
-%option nounput 
+%option nounput
 %{
 #define YY_NO_UNISTD_H
 
@@ -47,9 +48,9 @@ int yy_input(char* buf, int max_size);
 static TSourceLoc lexlineno = { 0, 0 };
 
 extern int yyparse(TParseContext&);
-#define YY_DECL int yylex(YYSTYPE* pyylval, TParseContext& parseContext)    
+#define YY_DECL int yylex(YYSTYPE* pyylval, TParseContext& parseContext)
 
- 
+
 #define YY_INPUT(buf,result,max_size) (result = yy_input(buf, max_size))
 
 %}
@@ -84,8 +85,8 @@ extern int yyparse(TParseContext&);
 "float1"       {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(FLOAT_TYPE); }
 "int"          {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(INT_TYPE); }
 "int1"         {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(INT_TYPE); }
-"uint"          {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(INT_TYPE); /* @TODO proper unsigned int? */ }
-"uint1"         {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(INT_TYPE); }
+"uint"          {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(UINT_TYPE); }
+"uint1"         {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(UINT_TYPE); }
 "void"         {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(VOID_TYPE); }
 "bool"         {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(BOOL_TYPE); }
 "bool1"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return(BOOL_TYPE); }
@@ -150,9 +151,9 @@ extern int yyparse(TParseContext&);
 "int2"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC2); }
 "int3"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC3); }
 "int4"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC4); }
-"uint2"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC2); /* @TODO proper unsigned type? */ }
-"uint3"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC3); }
-"uint4"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (IVEC4); }
+"uint2"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (UVEC2); }
+"uint3"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (UVEC3); }
+"uint4"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (UVEC4); }
 "bool2"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (BVEC2); }
 "bool3"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (BVEC3); }
 "bool4"        {  pyylval->lex.line = lexlineno; parseContext.lexAfterType = true; return (BVEC4); }
@@ -221,10 +222,10 @@ extern int yyparse(TParseContext&);
 "namespace"    {  PaReservedWord(); return 0; }
 "using"        {  PaReservedWord(); return 0; }
 
-{L}({L}|{D})*       {  
-   pyylval->lex.line = lexlineno; 
-   pyylval->lex.string = NewPoolTString(yytext); 
-   return PaIdentOrType(*pyylval->lex.string, parseContext, pyylval->lex.symbol); 
+{L}({L}|{D})*       {
+   pyylval->lex.line = lexlineno;
+   pyylval->lex.string = NewPoolTString(yytext);
+   return PaIdentOrType(*pyylval->lex.string, parseContext, pyylval->lex.symbol);
 }
 
 {D}+{E}{F}?           { pyylval->lex.line = lexlineno; pyylval->lex.f = static_cast<float>(atof(yytext)); return(FLOATCONSTANT); }
@@ -232,6 +233,10 @@ extern int yyparse(TParseContext&);
 "."{D}+({E})?{F}?     { pyylval->lex.line = lexlineno; pyylval->lex.f = static_cast<float>(atof(yytext)); return(FLOATCONSTANT); }
 {D}+{F}               { pyylval->lex.line = lexlineno; pyylval->lex.f = static_cast<float>(atof(yytext)); return(FLOATCONSTANT); }
 
+0[xX]{H}+{U}          { pyylval->lex.line = lexlineno; pyylval->lex.i = strtol(yytext, 0, 0); return(UINTCONSTANT); }
+0{O}+{U}              { pyylval->lex.line = lexlineno; pyylval->lex.i = strtol(yytext, 0, 0); return(UINTCONSTANT); }
+0{D}+{U}              { pyylval->lex.line = lexlineno; parseContext.error(lexlineno, "Invalid Octal number.", yytext, "", ""); parseContext.recover(); return 0;}
+{D}+{U}               { pyylval->lex.line = lexlineno; pyylval->lex.i = strtol(yytext, 0, 0); return(UINTCONSTANT); }
 0[xX]{H}+{I}?         { pyylval->lex.line = lexlineno; pyylval->lex.i = strtol(yytext, 0, 0); return(INTCONSTANT); }
 0{O}+{I}?             { pyylval->lex.line = lexlineno; pyylval->lex.i = strtol(yytext, 0, 0); return(INTCONSTANT); }
 0{D}+{I}?             { pyylval->lex.line = lexlineno; parseContext.error(lexlineno, "Invalid Octal number.", yytext, "", ""); parseContext.recover(); return 0;}
@@ -241,7 +246,7 @@ extern int yyparse(TParseContext&);
 
 
 
-"/*"            {  int ret = PaParseComment(pyylval->lex.line, parseContext); if (!ret) return ret; }   
+"/*"            {  int ret = PaParseComment(pyylval->lex.line, parseContext); if (!ret) return ret; }
 
 "+="            {  pyylval->lex.line = lexlineno; return(ADD_ASSIGN); }
 "-="            {  pyylval->lex.line = lexlineno; return(SUB_ASSIGN); }
@@ -292,10 +297,10 @@ extern int yyparse(TParseContext&);
 
 \"[^\"]*\"  {  pyylval->lex.line = lexlineno; return(STRINGCONSTANT); }
 
-<FIELDS>{L}({L}|{D})* { 
-BEGIN(INITIAL);      
-    pyylval->lex.line = lexlineno;     
-    pyylval->lex.string = NewPoolTString(yytext); 
+<FIELDS>{L}({L}|{D})* {
+BEGIN(INITIAL);
+    pyylval->lex.line = lexlineno;
+    pyylval->lex.string = NewPoolTString(yytext);
     return FIELD_SELECTION; }
 <FIELDS>[ \t\v\f\r] {}
 
@@ -326,22 +331,22 @@ static int cpp_get_token (hlmojo_Preprocessor* pp, char* buf, int maxSize)
 	tokstr = hlmojo_preprocessor_nexttoken (pp, &len, &token);
 	if (tokstr == NULL)
 		return 0;
-		
+
 	if (hlmojo_preprocessor_outofmemory(pp))
 	{
 		g_parseContext->error (gNullSourceLoc, "out of memory", "", "");
 		GlobalParseContext->recover();
 		buf[0] = 0;
 		return 0;
-	}	
-	
+	}
+
 	unsigned int line = 0;
 	const char* fname = hlmojo_preprocessor_sourcepos (pp, &line);
 	TSourceLoc loc;
 	loc.file = fname;
 	loc.line = line;
 	SetLineNumber (loc, lexlineno);
-	
+
 	if (token == TOKEN_PREPROCESSING_ERROR)
 	{
 		g_parseContext->error (lexlineno, tokstr, "", "");
@@ -432,9 +437,9 @@ int PaParseString(char* source, TParseContext& parseContextLocal, Hlsl2Glsl_Pars
 		parseContextLocal.recover();
 		return 1;
 	}
-	
+
 	sourceLen = (int) strlen(source);
-	
+
 	MOJOSHADER_hlslang_includeOpen openCallback = NULL;
     MOJOSHADER_hlslang_includeClose closeCallback = NULL;
 	void* data = NULL;
@@ -455,17 +460,17 @@ int PaParseString(char* source, TParseContext& parseContextLocal, Hlsl2Glsl_Pars
 		data);
 	g_cpp = pp;
 	g_parseContext = &parseContextLocal;
-	
+
     yyrestart(0);
     (&parseContextLocal)->AfterEOF = false;
 	lexlineno.file = NULL;
     lexlineno.line = 1;
-	
+
 	int result = 0;
-   
+
     if (sourceLen >= 0)
 	{
-        yyparse(parseContextLocal);    
+        yyparse(parseContextLocal);
 
         if (parseContextLocal.recoveredFromError || parseContextLocal.numErrors > 0)
              result = 1;
@@ -476,11 +481,11 @@ int PaParseString(char* source, TParseContext& parseContextLocal, Hlsl2Glsl_Pars
 	{
         result = 0;
 	}
-	
+
 	hlmojo_preprocessor_end (pp);
 	g_cpp = NULL;
 	g_parseContext = NULL;
-	
+
 	return result;
 }
 
@@ -507,7 +512,7 @@ int PaIdentOrType(TString& id, TParseContext& parseContextLocal, TSymbol*& symbo
             return TYPE_NAME;
         }
     }
-    
+
     return IDENTIFIER;
 }
 
@@ -515,7 +520,7 @@ int PaParseComment(TSourceLoc &lineno, TParseContext& parseContextLocal)
 {
     int transitionFlag = 0;
     int nextChar;
-    
+
     while (transitionFlag != 2) {
         nextChar = yyinput();
         if (nextChar == '\n')
@@ -533,7 +538,7 @@ int PaParseComment(TSourceLoc &lineno, TParseContext& parseContextLocal)
             /* Raise error message here */
             parseContextLocal.error(lexlineno, "End of shader found before end of comment.", "", "", "");
             GlobalParseContext->recover();
-            return YY_NULL; 
+            return YY_NULL;
         default :  /* Any other character will be a part of the comment */
             transitionFlag = 0;
         }

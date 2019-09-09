@@ -20,6 +20,10 @@ const char kGLSLTypeNames[EgstTypeCount][32] =
    "ivec2",
    "ivec3",
    "ivec4",
+   "uint",
+   "uvec2",
+   "uvec3",
+   "uvec4",
    "float",
    "vec2",
    "vec3",
@@ -71,16 +75,20 @@ void writeType (std::stringstream &out, EGlslSymbolType type, const GlslStruct *
 
    switch (type)
    {
-   case EgstVoid:  
-   case EgstBool:  
-   case EgstBool2: 
-   case EgstBool3: 
-   case EgstBool4: 
-   case EgstInt:   
-   case EgstInt2:  
-   case EgstInt3:  
-   case EgstInt4:  
-   case EgstFloat: 
+   case EgstVoid:
+   case EgstBool:
+   case EgstBool2:
+   case EgstBool3:
+   case EgstBool4:
+   case EgstInt:
+   case EgstInt2:
+   case EgstInt3:
+   case EgstInt4:
+   case EgstUInt:
+   case EgstUInt2:
+   case EgstUInt3:
+   case EgstUInt4:
+   case EgstFloat:
    case EgstFloat2:
    case EgstFloat3:
    case EgstFloat4:
@@ -93,7 +101,7 @@ void writeType (std::stringstream &out, EGlslSymbolType type, const GlslStruct *
    case EgstFloat4x2:
    case EgstFloat4x3:
    case EgstFloat4x4:
-   case EgstSamplerGeneric: 
+   case EgstSamplerGeneric:
    case EgstSampler1D:
    case EgstSampler1DShadow:
    case EgstSampler2D:
@@ -163,6 +171,8 @@ EGlslSymbolType translateType( const TType *type )
          return EGlslSymbolType(EgstBool + (type->getRowsCount() - 1));
       case EbtInt:
          return EGlslSymbolType(EgstInt + (type->getRowsCount() - 1));
+      case EbtUInt:
+         return EGlslSymbolType(EgstUInt + (type->getRowsCount() - 1));
       case EbtFloat:
          return EGlslSymbolType(EgstFloat + (type->getRowsCount() - 1));
       case EbtSamplerGeneric:
@@ -241,19 +251,23 @@ int getElements( EGlslSymbolType t )
 	{
 	case EgstBool:
 	case EgstInt:
+	case EgstUInt:
 	case EgstFloat:
 	case EgstStruct:
 		return 1;
 	case EgstBool2:
 	case EgstInt2:
+	case EgstUInt2:
 	case EgstFloat2:
 		return 2;
 	case EgstBool3:
 	case EgstInt3:
+	case EgstUInt3:
 	case EgstFloat3:
 		return 3;
 	case EgstBool4:
 	case EgstInt4:
+	case EgstUInt4:
 	case EgstFloat4:
 	case EgstFloat2x2:
 		return 4;

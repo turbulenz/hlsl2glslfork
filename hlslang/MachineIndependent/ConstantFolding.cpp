@@ -17,16 +17,16 @@ TIntermConstant* FoldBinaryConstantExpression(TOperator op, TIntermConstant* nod
 		return NULL;
 	if (nodeA->getType() != nodeB->getType())
 		return NULL;
-	
+
 	// for now, only support integers and floats
-	if (nodeA->getBasicType() != EbtInt && nodeA->getBasicType() != EbtFloat)
+	if (nodeA->getBasicType() != EbtInt && nodeA->getBasicType() != EbtUInt && nodeA->getBasicType() != EbtFloat)
 		return NULL;
-		
-	
+
+
 	TIntermConstant* newNode = new TIntermConstant(nodeA->getType());
 
 #define DO_FOLD_OP(oper) \
-	if (nodeA->getBasicType() == EbtInt) \
+	if (nodeA->getBasicType() == EbtInt || nodeA->getBasicType() == EbtUInt) \
 		for (unsigned i = 0; i < newNode->getCount(); ++i) \
 			newNode->setValue(i, nodeA->getValue(i).asInt oper nodeB->getValue(i).asInt); \
 	else \
@@ -34,7 +34,7 @@ TIntermConstant* FoldBinaryConstantExpression(TOperator op, TIntermConstant* nod
 			newNode->setValue(i, nodeA->getValue(i).asFloat oper nodeB->getValue(i).asFloat)
 
 #define DO_FOLD_OP_INT(oper) \
-	if (nodeA->getBasicType() == EbtInt) \
+	if (nodeA->getBasicType() == EbtInt || nodeA->getBasicType() == EbtUInt) \
 		for (unsigned i = 0; i < newNode->getCount(); ++i) \
 		newNode->setValue(i, nodeA->getValue(i).asInt oper nodeB->getValue(i).asInt); \
 	else { \
@@ -43,13 +43,13 @@ TIntermConstant* FoldBinaryConstantExpression(TOperator op, TIntermConstant* nod
 	}
 
 #define DO_FOLD_OP_ZERO(oper) \
-	if (nodeA->getBasicType() == EbtInt) \
+	if (nodeA->getBasicType() == EbtInt || nodeA->getBasicType() == EbtUInt) \
 		for (unsigned i = 0; i < newNode->getCount(); ++i) \
 			newNode->setValue(i, nodeB->getValue(i).asInt ? nodeA->getValue(i).asInt oper nodeB->getValue(i).asInt : 0); \
 	else \
 		for (unsigned i = 0; i < newNode->getCount(); ++i) \
 			newNode->setValue(i, nodeB->getValue(i).asInt ? nodeA->getValue(i).asFloat oper nodeB->getValue(i).asFloat : 0)
-	
+
 	switch (op)
 	{
 		case EOpAdd: DO_FOLD_OP(+); break;
@@ -88,16 +88,16 @@ TIntermConstant* FoldUnaryConstantExpression(TOperator op, TIntermConstant* node
 {
 	if (!node)
 		return NULL;
-	
+
 	// for now, only support integers and floats
-	if (node->getBasicType() != EbtInt && node->getBasicType() != EbtFloat)
+	if (node->getBasicType() != EbtInt && node->getBasicType() != EbtUInt && node->getBasicType() != EbtFloat)
 		return NULL;
-	
+
 	TIntermConstant* newNode = new TIntermConstant(node->getType());
 	switch (op)
 	{
 		case EOpNegative:
-			if (node->getBasicType() == EbtInt)
+			if (node->getBasicType() == EbtInt || node->getBasicType() == EbtUInt)
 			{
 				for (unsigned i = 0; i < newNode->getCount(); ++i)
 					newNode->setValue(i, -node->getValue(i).asInt);

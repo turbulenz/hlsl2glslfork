@@ -41,7 +41,7 @@ static void logf(const char* format, ...)
     va_start(args, format);
     vprintf(format, args);
     va_end(args); //lint !e1924: C-style cast
-    
+
     char buffer[4096];
     const size_t bufferSize = sizeof(buffer) - 1;
 
@@ -49,7 +49,7 @@ static void logf(const char* format, ...)
     va_start(args, format);
     int rc = _vsnprintf(buffer, bufferSize, format, args);
     va_end(args); //lint !e1924: C-style cast
-    
+
     size_t outputLen = (rc <= 0) ? 0 : static_cast<size_t>(rc);
     buffer[outputLen] = '\0';
 
@@ -106,9 +106,9 @@ static StringVector GetFiles (const std::string& folder, const std::string& ends
 	} while (FindNextFileA (hFind, &FindFileData));
 
 	FindClose (hFind);
-	
+
 	#else
-	
+
 	DIR *dirp;
 	struct dirent *dp;
 
@@ -125,7 +125,7 @@ static StringVector GetFiles (const std::string& folder, const std::string& ends
 		res.push_back (fname);
 	}
 	closedir(dirp);
-	
+
 	#endif
 
 	return res;
@@ -154,7 +154,7 @@ static bool ReadStringFromFile (const char* pathName, std::string& output)
 
 	if (file == NULL)
 		return false;
-	
+
 	fseek(file, 0, SEEK_END);
 	long length = ftell(file);
 	fseek(file, 0, SEEK_SET);
@@ -163,12 +163,12 @@ static bool ReadStringFromFile (const char* pathName, std::string& output)
 		fclose( file );
 		return false;
 	}
-	
+
 	output.resize(length);
 	size_t readLength = fread(&*output.begin(), 1, length, file);
-	
+
 	fclose(file);
-	
+
 	if (readLength != length)
 	{
 		output.clear();
@@ -176,7 +176,7 @@ static bool ReadStringFromFile (const char* pathName, std::string& output)
 	}
 
 	replace_string(output, "\r\n", "\n", 0);
-	
+
 	return true;
 }
 
@@ -193,7 +193,7 @@ static bool InitializeOpenGL ()
 	#if !USE_REAL_OPENGL_TO_CHECK
 	return false;
 	#endif
-	
+
 	bool hasGLSL = false;
 
 #ifdef _MSC_VER
@@ -236,7 +236,7 @@ static bool InitializeOpenGL ()
 	};
 	GLint num;
 	CGLPixelFormatObj pix;
-	
+
 	// create legacy context
 	CGLChoosePixelFormat(attributes, &pix, &num);
 	if (pix == NULL)
@@ -246,7 +246,7 @@ static bool InitializeOpenGL ()
 		return false;
 	CGLDestroyPixelFormat(pix);
 	CGLSetCurrentContext(s_GLContext);
-	
+
 	// create core 3.2 context
 	CGLChoosePixelFormat(attributes3, &pix, &num);
 	if (pix == NULL)
@@ -255,7 +255,7 @@ static bool InitializeOpenGL ()
 	if (s_GLContext3 == NULL)
 		return false;
 	CGLDestroyPixelFormat(pix);
-	
+
 #else
         int argc = 0;
         char** argv = NULL;
@@ -263,17 +263,17 @@ static bool InitializeOpenGL ()
         glutCreateWindow("hlsl2glsltest");
         glewInit();
 #endif
-	
+
 	// check if we have GLSL
 	const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
 	hasGLSL = extensions != NULL && strstr(extensions, "GL_ARB_shader_objects") && strstr(extensions, "GL_ARB_vertex_shader") && strstr(extensions, "GL_ARB_fragment_shader");
-	
+
 	#if defined(__APPLE__)
 	// using core profile; always has GLSL
 	hasGLSL = true;
 	#endif
-	
-	
+
+
 #ifdef _MSC_VER
 	if (hasGLSL)
 	{
@@ -285,7 +285,7 @@ static bool InitializeOpenGL ()
 		glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
 	}
 #endif
-	
+
 
 	return hasGLSL;
 }
@@ -306,7 +306,7 @@ static void replace_string (std::string& target, const std::string& search, cons
 {
 	if (search.empty())
 		return;
-	
+
 	std::string::size_type p = startPos;
 	while ((p = target.find (search, p)) != std::string::npos)
 	{
@@ -321,7 +321,7 @@ static bool CheckGLSL (bool vertex, ETargetVersion version, const std::string& s
 	const char* sourcePtr = source.c_str();
 	std::string newSrc;
 
-	
+
 #	ifdef __APPLE__
 	// Mac core context does not accept any older shader versions, so need to switch to
 	// either legacy context or core one.
@@ -339,8 +339,8 @@ static bool CheckGLSL (bool vertex, ETargetVersion version, const std::string& s
 		s_GL3Active = false;
 	}
 #	endif
-	
-	
+
+
 	if (version == ETargetGLSL_ES_100 || version == ETargetGLSL_ES_300)
 	{
 		newSrc.reserve(source.size());
@@ -396,10 +396,10 @@ static bool CheckGLSL (bool vertex, ETargetVersion version, const std::string& s
 		replace_string (newSrc, "GL_EXT_draw_instanced", "GL_ARB_draw_instanced", 0);
 		replace_string (newSrc, "GL_NV_texture_array", "GL_EXT_texture_array", 0);
 		replace_string (newSrc, "gl_InstanceIDEXT", "gl_InstanceIDARB", 0);
-		
+
 		sourcePtr = newSrc.c_str();
 	}
-	
+
 	GLuint shader = glCreateShader (vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
 	glShaderSource (shader, 1, &sourcePtr, NULL);
 	glCompileShader (shader);
@@ -497,7 +497,7 @@ static const ETargetVersion kTargets3[NUM_RUN_TYPES] = {
 static std::string GetCompiledShaderText(ShHandle parser)
 {
 	std::string txt = Hlsl2Glsl_GetShader (parser);
-	
+
 	int count = Hlsl2Glsl_GetUniformCount (parser);
 	if (count > 0)
 	{
@@ -518,7 +518,7 @@ static std::string GetCompiledShaderText(ShHandle parser)
 			txt += "\n";
 		}
 	}
-	
+
 	return txt;
 }
 
@@ -532,9 +532,9 @@ struct IncludeContext
 static bool C_DECL IncludeOpenCallback(bool isSystem, const char* fname, const char* parentfname, std::string& output, void* d)
 {
 	const IncludeContext* data = reinterpret_cast<IncludeContext*>(d);
-	
+
 	std::string pathName = data->currentFolder + "/" + fname;
-	
+
 	return ReadStringFromFile(pathName.c_str(), output);
 }
 
@@ -548,14 +548,14 @@ static bool TestFile (TestRun type,
 					  bool doCheckGLSL)
 {
 	assert(version != ETargetVersionCount);
-	
+
 	std::string input;
 	if (!ReadStringFromFile (inputPath.c_str(), input))
 	{
 		printf ("  failed to read input file\n");
 		return false;
 	}
-	
+
 	ShHandle parser = Hlsl2Glsl_ConstructCompiler (kTypeLangs[type]);
 
 	const char* sourceStr = input.c_str();
@@ -564,13 +564,13 @@ static bool TestFile (TestRun type,
 
 	if (kDumpShaderAST)
 		options |= ETranslateOpIntermediate;
-	
+
 	IncludeContext includeCtx;
 	includeCtx.currentFolder = inputPath.substr(0, inputPath.rfind('/'));
 	Hlsl2Glsl_ParseCallbacks includeCB;
-	includeCB.includeOpenCallback = IncludeOpenCallback;
+	//includeCB.includeOpenCallback = IncludeOpenCallback;
 	includeCB.data = &includeCtx;
-		
+
 	int parseOk = Hlsl2Glsl_Parse (parser, sourceStr, version, &includeCB, options);
 	const char* infoLog = Hlsl2Glsl_GetInfoLog( parser );
 	if (kDumpShaderAST)
@@ -589,17 +589,17 @@ static bool TestFile (TestRun type,
 			"TANGENT",
 		};
 		Hlsl2Glsl_SetUserAttributeNames (parser, kAttribSemantic, kAttribString, 1);
-		
+
 		int translateOk = Hlsl2Glsl_Translate (parser, entryPoint, version, options);
 		const char* infoLog = Hlsl2Glsl_GetInfoLog( parser );
 		if (translateOk)
 		{
 			std::string text = GetCompiledShaderText(parser);
-			
+
 			for (size_t i = 0, n = text.size(); i != n; ++i)
 			{
 			   char c = text[i];
-			   
+
 			   if (!isascii(c))
 			   {
 				   printf ("  contains non-ascii '%c' (0x%02X)\n", c, c);
@@ -664,18 +664,18 @@ static bool TestFileFailure (TestRun type,
 	if (kDumpShaderAST)
 		options |= ETranslateOpIntermediate;
 	int parseOk = Hlsl2Glsl_Parse (parser, sourceStr, version, NULL, options);
-	
+
 	if (parseOk)
 	{
 		int translateOk = Hlsl2Glsl_Translate (parser, "main", version, options);
-		
-		if (translateOk) 
+
+		if (translateOk)
 		{
 			printf ("  translation was expected to fail\n");
 		    res = false;
 		}
     }
-    
+
 	std::string text = Hlsl2Glsl_GetInfoLog( parser );
 	if (!res)
 	{
@@ -683,12 +683,12 @@ static bool TestFileFailure (TestRun type,
 		text += Hlsl2Glsl_GetShader (parser);
 	}
 	std::string output;
-	
+
 	if (res)
 	{
 	    ReadStringFromFile (outputPath.c_str(), output);
     }
-    
+
 	if (!res || (text != output))
 	{
 		// write output
@@ -708,7 +708,7 @@ static bool TestCombinedFile(const std::string& inputPath, ETargetVersion versio
 {
 	std::string outname = inputPath.substr (0,inputPath.size()-7);
 	std::string frag_out, vert_out;
-	
+
 	if (version == ETargetGLSL_ES_100) {
 		vert_out = outname + "-vertex-outES.txt";
 		frag_out = outname + "-fragment-outES.txt";
@@ -716,7 +716,7 @@ static bool TestCombinedFile(const std::string& inputPath, ETargetVersion versio
 		vert_out = outname + "-vertex-out.txt";
 		frag_out = outname + "-fragment-out.txt";
 	}
-	
+
 	bool res = TestFile(VERTEX, inputPath, vert_out, "vs_main", version, 0, checkGL);
 	return res & TestFile(FRAGMENT, inputPath, frag_out, "ps_main", version, 0, checkGL);
 }
@@ -737,7 +737,7 @@ static bool TestFile (TestRun type,
 		suffix = "-outES3.txt";
 	else if (options & ETranslateOpEmitGLSL120ArrayInitWorkaround)
 		suffix = "-out120arr.txt";
-	
+
 	if (type == VERTEX_FAILURES || type == FRAGMENT_FAILURES) {
 		return TestFileFailure(type, inputPath, outname + suffix);
 	} else {
@@ -758,9 +758,9 @@ int main (int argc, const char** argv)
 	bool hasOpenGL = InitializeOpenGL ();
 	if (!hasOpenGL)
 		printf("NOTE: will not check GLSL with actual driver (no GL/GLSL)\n");
-	
+
 	clock_t time0 = clock();
-	
+
 	Hlsl2Glsl_Initialize ();
 
 	std::string baseFolder = argv[1];
@@ -785,7 +785,7 @@ int main (int argc, const char** argv)
 			//	continue;
 			const bool preprocessorTest = (inname.find("pp-") == 0);
 			bool ok = true;
-			
+
 			printf ("test %s\n", inname.c_str());
 			if (type == BOTH) {
 				ok = TestCombinedFile(testFolder + "/" + inname, version1, hasOpenGL);
@@ -801,10 +801,10 @@ int main (int argc, const char** argv)
 						ok = TestFile(TestRun(type), testFolder + "/" + inname, version3, 0, hasOpenGL);
 				}
 			}
-			
+
 			if (!ok)
 				++errors;
-		}		
+		}
 	}
 
 	clock_t time1 = clock();
@@ -813,7 +813,7 @@ int main (int argc, const char** argv)
 		printf ("%i tests, %i FAILED, %.2fs\n", (int)tests, (int)errors, t);
 	else
 		printf ("%i tests succeeded, %.2fs\n", (int)tests, t);
-	
+
 	Hlsl2Glsl_Shutdown();
 	CleanupOpenGL();
 

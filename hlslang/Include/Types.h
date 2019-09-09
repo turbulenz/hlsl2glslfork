@@ -28,7 +28,7 @@ inline TTypeList* NewPoolTTypeList()
 
 //
 // This is a workaround for a problem with the yacc stack,  It can't have
-// types that it thinks have non-trivial constructors.  It should 
+// types that it thinks have non-trivial constructors.  It should
 // just be used while recognizing the grammar, not anything else.  Pointers
 // could be used, but also trying to avoid lots of memory management overhead.
 //
@@ -207,10 +207,10 @@ public:
    }
    void setType(TBasicType t, int cols, int rows, bool m, TType* userDef = 0)
    {
-      type = t; 
-      matcols = cols; 
-      matrows = rows; 
-      matrix = m; 
+      type = t;
+      matcols = cols;
+      matrows = rows;
+      matrix = m;
       if (userDef)
          structure = userDef->getStruct();
       // leave array information intact.
@@ -225,14 +225,14 @@ public:
    }
    const TString& getTypeName() const
    {
-      assert(typeName);          
-      return *typeName; 
+      assert(typeName);
+      return *typeName;
    }
 
    const TString& getFieldName() const
    {
       assert(fieldName);
-      return *fieldName; 
+      return *fieldName;
    }
 
    TBasicType getBasicType() const { return type; }
@@ -286,6 +286,7 @@ public:
       case EbtVoid:              return "void";              break;
       case EbtFloat:             return "float";             break;
       case EbtInt:               return "int";               break;
+      case EbtUInt:              return "uint";              break;
       case EbtBool:              return "bool";              break;
       case EbtSampler1D:         return "sampler1D";         break;
       case EbtSampler2D:         return "sampler2D";         break;
@@ -302,7 +303,7 @@ public:
    }
    TTypeList* getStruct() const { return structure; }
    void setStruct(TTypeList* s) { structure = s; }
-	
+
    int getObjectSize() const
    {
       int totalSize;
@@ -325,7 +326,7 @@ public:
       if (!mangled)
       {
          mangled = NewPoolTString("");
-         buildMangledName(*mangled);            
+         buildMangledName(*mangled);
          *mangled += ';' ;
       }
 

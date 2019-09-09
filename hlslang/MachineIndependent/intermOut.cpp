@@ -169,11 +169,17 @@ bool OutputUnary(bool, /* preVisit */ TIntermUnary* node, TIntermTraverser* it)
    case EOpPreDecrement:   out.debug << "Pre-Decrement";        break;
 
    case EOpConvIntToBool:  out.debug << "Convert int to bool";  break;
+   case EOpConvUIntToBool: out.debug << "Convert uint to bool"; break;
    case EOpConvFloatToBool:out.debug << "Convert float to bool";break;
    case EOpConvBoolToFloat:out.debug << "Convert bool to float";break;
    case EOpConvIntToFloat: out.debug << "Convert int to float"; break;
    case EOpConvFloatToInt: out.debug << "Convert float to int"; break;
    case EOpConvBoolToInt:  out.debug << "Convert bool to int";  break;
+   case EOpConvUIntToFloat:out.debug << "Convert uint to float";break;
+   case EOpConvFloatToUInt:out.debug << "Convert float to uint";break;
+   case EOpConvBoolToUInt: out.debug << "Convert bool to uint"; break;
+   case EOpConvIntToUInt:  out.debug << "Convert int to uint";  break;
+   case EOpConvUIntToInt:  out.debug << "Convert int to uint";  break;
 
    case EOpRadians:        out.debug << "radians";              break;
    case EOpDegrees:        out.debug << "degrees";              break;
@@ -254,6 +260,10 @@ bool OutputAggregate(bool, /* preVisit */ TIntermAggregate* node, TIntermTravers
    case EOpConstructIVec2: out.debug << "Construct ivec2"; break;
    case EOpConstructIVec3: out.debug << "Construct ivec3"; break;
    case EOpConstructIVec4: out.debug << "Construct ivec4"; break;
+   case EOpConstructUInt:  out.debug << "Construct uint";   break;
+   case EOpConstructUVec2: out.debug << "Construct uvec2"; break;
+   case EOpConstructUVec3: out.debug << "Construct uvec3"; break;
+   case EOpConstructUVec4: out.debug << "Construct uvec4"; break;
 
    case EOpConstructMat2x2:  out.debug << "Construct mat2x2";  break;
    case EOpConstructMat2x3:  out.debug << "Construct mat2x3";  break;
@@ -408,6 +418,14 @@ void OutputConstant(TIntermConstant* node, TIntermTraverser* it)
             out.debug << buf << "\n";
          }
          break;
+      case EbtUInt:
+         {
+            char buf[300];
+            sprintf(buf, "%d (%s)", node->toInt(i), "const uint");
+
+            out.debug << buf << "\n";
+            break;
+         }
       case EbtInt:
          {
             char buf[300];
