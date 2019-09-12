@@ -33,12 +33,12 @@ void TIntermSymbol::traverse(TIntermTraverser* it)
 }
 
 void TIntermDeclaration::traverse(TIntermTraverser* it)
-{	
+{
 	if (it->preVisit && it->visitDeclaration && !it->visitDeclaration(true, this, it))
 		return;
-	
+
 	_declaration->traverse(it);
-	
+
 	if (it->postVisit && it->visitDeclaration)
 		it->visitDeclaration(false, this, it);
 }
@@ -142,7 +142,8 @@ void TIntermSelection::traverse(TIntermTraverser* it)
    if (visit)
    {
       ++it->depth;
-      condition->traverse(it);
+      if (condition)
+          condition->traverse(it);
       if (trueBlock)
          trueBlock->traverse(it);
       if (falseBlock)
